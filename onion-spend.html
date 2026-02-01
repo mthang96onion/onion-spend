@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Onion's Lab - Blue Edition v4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .tab-active { color: #1d4ed8; border-bottom: 3px solid #1d4ed8; }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        input, select, textarea { border: 1px solid #cbd5e1 !important; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+        .loading-overlay { background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); }
+        .blue-gradient { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        .cat-checkbox:checked + label { background-color: #dbeafe; color: #1e40af; border-color: #3b82f6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .drill-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Màn hình tải -->
+    <div id="loading" class="fixed inset-0 loading-overlay z-50 flex items-center justify-center hidden">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
+            <p class="mt-3 text-blue-700 font-bold text-sm text-center px-4">Đang đồng bộ dữ liệu...<br><span class="text-[10px] font-normal opacity-70">Vui lòng đợi giây lát</span></p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="blue-gradient text-white p-6 rounded-b-[2rem] shadow-lg mb-6 sticky top-0 z-30">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Onion's Blue 💸</h1>
+                <p class="text-blue-100 text-[10px] font-medium uppercase tracking-widest opacity-80" id="sync-status">Sẵn sàng</p>
+            </div>
+            <button onclick="fetchData()" class="bg-white/20 p-2 rounded-lg backdrop-blur-sm active:scale-90 transition-all">
+                <i class="fas fa-redo-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="px-4 max-w-md mx-auto space-y-6">
+        
+        <!-- Tab Nhập Liệu -->
+        <div id="tab-input-content" class="space-y-4">
+            <div class="card p-6">
+                <h2 class="text-md font-bold mb-5 text-slate-800 flex items-center">
+                    <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    Ghi Chép Mới
+                </h2>
+                <form id="expenseForm" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ngày</label>
+                            <input type="date" id="date" required class="w-full p-2.5 rounded-lg text-sm bg-slate-50 border-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Loại chi</label>
+                            <select id="category" required class="w-full p-2.5 rounded-lg text-sm bg-slate-50 border-none">
+                                <option value="Ăn uống">Ăn uống</option>
+                                <option value="Giải trí">Giải trí</option>
+                                <option value="Tiền nhà">Tiền nhà</option>
+                                <option value="Đi lại">Đi lại</option>
+                                <option value="Mua sắm">Mua sắm</option>
+                                <option value="Du lịch">Du lịch</option>
+                                <option value="Y tế">Y tế</option>
+                                <option value="Phong bì">Phong bì</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Số tiền (VND)</label>
+                        <input type="number" id="amount" placeholder="Nhập số tiền..." required class="w-full p-3 rounded-lg text-lg font-bold text-blue-700 bg-slate-50 border-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ghi chú</label>
+                        <textarea id="note" rows="2" placeholder="Ghi chú thêm..." class="w-full p-3 rounded-lg text-sm bg-slate-50 border-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full blue-gradient text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition-all mt-2 uppercase text-sm">
+                        Lưu vào Google Sheet
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab Thống Kê -->
+        <div id="tab-stats-content" class="hidden space-y-5">
+            <!-- Filter Section -->
+            <div class="card p-4 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase">Bộ lọc nâng cao</h3>
+                    <i class="fas fa-filter text-blue-600"></i>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2">Phạm vi thời gian</label>
+                        <select id="filter-period" onchange="handlePeriodChange()" class="w-full p-2.5 rounded-lg text-xs font-semibold bg-slate-50">
+                            <option value="this_month" selected>Tháng này</option>
+                            <option value="last_month">Tháng trước</option>
+                            <option value="this_week">Tuần này</option>
+                            <option value="last_week">Tuần trước</option>
+                            <option value="this_year">Năm nay</option>
+                            <option value="last_year">Năm trước</option>
+                            <option value="last_7_days">7 ngày qua</option>
+                            <option value="last_30_days">30 ngày qua</option>
+                            <option value="today">Hôm nay</option>
+                            <option value="all">Tất cả thời gian</option>
+                            <option value="custom">Tùy chỉnh ngày...</option>
+                        </select>
+                    </div>
+                    <div id="custom-date-box" class="hidden grid grid-cols-2 gap-2 p-2 bg-blue-50 rounded-lg">
+                        <input type="date" id="start-date" class="p-2 rounded text-[10px]">
+                        <input type="date" id="end-date" class="p-2 rounded text-[10px]">
+                        <button onclick="applyFilters()" class="col-span-2 py-1.5 bg-blue-600 text-white text-[10px] font-bold rounded uppercase">Áp dụng</button>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2">Danh mục</label>
+                        <div id="category-multi-box" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="card p-4 text-center border-t-4 border-blue-600">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">Tổng chi tiêu</p>
+                    <p id="totalExpense" class="text-md font-bold text-slate-800">0đ</p>
+                </div>
+                <div class="card p-4 text-center border-t-4 border-blue-400">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">Trung bình/Ngày</p>
+                    <p id="avgDaily" class="text-md font-bold text-slate-800">0đ</p>
+                </div>
+            </div>
+
+            <!-- Category Bar Chart -->
+            <div class="card p-4">
+                <h3 class="text-[10px] font-bold mb-4 text-slate-400 uppercase text-center">Cơ cấu danh mục (%)</h3>
+                <div class="h-64"><canvas id="categoryBarChart"></canvas></div>
+            </div>
+
+            <!-- Combined Spending Chart (Line + Stacked Bar) -->
+            <div class="card p-4 space-y-4">
+                <div class="flex flex-col space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-[10px] font-bold text-slate-400 uppercase">Chi tiêu theo thời gian</h3>
+                        <div class="flex bg-slate-100 p-0.5 rounded-lg">
+                            <button onclick="changeDrill('month')" id="drill-month" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all active uppercase">Tháng</button>
+                            <button onclick="changeDrill('week')" id="drill-week" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all uppercase">Tuần</button>
+                            <button onclick="changeDrill('day')" id="drill-day" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all uppercase">Ngày</button>
+                        </div>
+                    </div>
+                    <p class="text-[8px] text-slate-400 italic">Đường: Tổng chi | Cột: Chi tiết từng loại</p>
+                </div>
+                <div class="h-72"><canvas id="drillChart"></canvas></div>
+            </div>
+
+            <!-- Cumulative Line Chart -->
+            <div class="card p-4">
+                <h3 class="text-[10px] font-bold mb-4 text-slate-400 uppercase text-center">Xu hướng tích lũy</h3>
+                <div class="h-48"><canvas id="lineChart"></canvas></div>
+            </div>
+
+            <!-- Raw Data Table -->
+            <div class="card p-4 overflow-hidden">
+                <h3 class="text-[10px] font-bold mb-3 text-slate-400 uppercase">Lịch sử giao dịch gần nhất</h3>
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-[11px] text-left">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-50">
+                                <th class="pb-2">Ngày</th>
+                                <th class="pb-2">Loại</th>
+                                <th class="pb-2 text-right">Số tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rawDataTable" class="text-slate-700 divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh Điều Hướng Dưới -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t flex justify-around p-3 shadow-2xl z-40">
+        <button onclick="switchTab('input')" id="btn-input" class="flex flex-col items-center tab-active w-1/2">
+            <i class="fas fa-edit text-xl"></i>
+            <span class="text-[9px] font-black mt-1 uppercase">Nhập liệu</span>
+        </button>
+        <button onclick="switchTab('stats')" id="btn-stats" class="flex flex-col items-center text-slate-400 w-1/2">
+            <i class="fas fa-chart-line text-xl"></i>
+            <span class="text-[9px] font-black mt-1 uppercase">Thống kê</span>
+        </button>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHKN-MOL4JMugIX8628RX3L2JPkg6sXD6x3Apeiwb-oIaHVUlpRg9KlusSJxzQ423T/exec'; 
+        const BLUE_PALETTE = ['#1e40af', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe', '#eff6ff'];
+
+        let allData = [];
+        let filteredData = [];
+        let chartInstances = {};
+        let currentDrillLevel = 'month';
+        let currentPeriodDays = 1;
+        let allCategoriesInSheet = [];
+
+        function parseSheetDate(dateInput) {
+            if (!dateInput) return new Date(0);
+            if (dateInput instanceof Date) return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
+            const s = String(dateInput);
+            let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+            m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (m) return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? new Date(0) : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        function updateCategoryFilterUI() {
+            const container = document.getElementById('category-multi-box');
+            container.innerHTML = '';
+            allCategoriesInSheet = [...new Set(allData.map(item => String(item.category || "Khác").trim()))].sort();
+            allCategoriesInSheet.forEach((cat, index) => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="checkbox" id="cat-${index}" value="${cat}" class="hidden cat-checkbox" checked onchange="applyFilters()">
+                    <label for="cat-${index}" class="px-3 py-1.5 border border-slate-200 rounded-full text-[10px] font-bold cursor-pointer transition-all block whitespace-nowrap">
+                        ${cat}
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-input-content').classList.toggle('hidden', tab !== 'input');
+            document.getElementById('tab-stats-content').classList.toggle('hidden', tab !== 'stats');
+            document.getElementById('btn-input').classList.toggle('tab-active', tab === 'input');
+            document.getElementById('btn-input').classList.toggle('text-gray-400', tab !== 'input');
+            document.getElementById('btn-stats').classList.toggle('tab-active', tab === 'stats');
+            document.getElementById('btn-stats').classList.toggle('text-gray-400', tab !== 'stats');
+            if(tab === 'stats' && allData.length === 0) fetchData();
+        }
+
+        async function fetchData() {
+            toggleLoading(true);
+            try {
+                const res = await fetch(SCRIPT_URL + '?action=get', { method: 'GET', redirect: 'follow' });
+                const raw = await res.json();
+                allData = raw.map(item => ({
+                    ...item,
+                    category: String(item.category || "Khác").trim(),
+                    amount: Number(item.amount) || 0
+                }));
+                document.getElementById('sync-status').innerText = "Đã cập nhật lúc " + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+                updateCategoryFilterUI();
+                applyFilters();
+            } catch (e) {
+                alert("Lỗi đồng bộ dữ liệu!");
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        function handlePeriodChange() {
+            const period = document.getElementById('filter-period').value;
+            document.getElementById('custom-date-box').classList.toggle('hidden', period !== 'custom');
+            if (period !== 'custom') applyFilters();
+        }
+
+        function applyFilters() {
+            const period = document.getElementById('filter-period').value;
+            const now = parseSheetDate(new Date());
+            const selectedCats = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => cb.value);
+            
+            let start, end;
+            let isPast = false;
+
+            switch(period) {
+                case 'today': start = now; end = now; break;
+                case 'this_week':
+                    const dWeek = now.getDay() || 7;
+                    start = new Date(now); start.setDate(now.getDate() - dWeek + 1);
+                    end = now; break;
+                case 'last_week':
+                    const lwDay = now.getDay() || 7;
+                    start = new Date(now); start.setDate(now.getDate() - lwDay - 6);
+                    end = new Date(start); end.setDate(start.getDate() + 6);
+                    isPast = true; break;
+                case 'this_month':
+                    start = new Date(now.getFullYear(), now.getMonth(), 1);
+                    end = now; break;
+                case 'last_month':
+                    start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    end = new Date(now.getFullYear(), now.getMonth(), 0);
+                    isPast = true; break;
+                case 'this_year':
+                    start = new Date(now.getFullYear(), 0, 1);
+                    end = now; break;
+                case 'last_year':
+                    start = new Date(now.getFullYear() - 1, 0, 1);
+                    end = new Date(now.getFullYear() - 1, 11, 31);
+                    isPast = true; break;
+                case 'last_7_days':
+                    start = new Date(now); start.setDate(now.getDate() - 6);
+                    end = now; break;
+                case 'last_30_days':
+                    start = new Date(now); start.setDate(now.getDate() - 29);
+                    end = now; break;
+                case 'custom':
+                    start = parseSheetDate(document.getElementById('start-date').value);
+                    end = parseSheetDate(document.getElementById('end-date').value);
+                    isPast = true; break;
+                default: start = new Date(2000, 0, 1); end = now;
+            }
+
+            const fStart = new Date(start); fStart.setHours(0,0,0,0);
+            const fEnd = new Date(end); fEnd.setHours(23,59,59,999);
+
+            currentPeriodDays = isPast ? 
+                Math.ceil(Math.abs(fEnd - fStart) / 86400000) || 1 :
+                Math.ceil(Math.abs(now - fStart) / 86400000) + 1;
+
+            filteredData = allData.filter(item => {
+                const itemDate = parseSheetDate(item.date);
+                return itemDate >= fStart && itemDate <= fEnd &&
+                       (selectedCats.length === 0 || selectedCats.includes(item.category));
+            });
+
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const total = filteredData.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('totalExpense').innerText = total.toLocaleString() + 'đ';
+            document.getElementById('avgDaily').innerText = Math.round(total / currentPeriodDays).toLocaleString() + 'đ';
+
+            renderCategoryBar();
+            renderCombinedDrillChart(); // BIỂU ĐỒ MỚI
+            renderLineChart();
+            renderTable();
+        }
+
+        // BIỂU ĐỒ 1: CỘT NGANG VỚI LABEL %
+        function renderCategoryBar() {
+            const m = {}; filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
+            const sortedLabels = Object.keys(m).sort((a,b) => m[b] - m[a]);
+            const total = Object.values(m).reduce((a,b) => a+b, 0) || 1;
+
+            if(chartInstances.cat) chartInstances.cat.destroy();
+            chartInstances.cat = new Chart(document.getElementById('categoryBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: sortedLabels,
+                    datasets: [{ data: sortedLabels.map(l => m[l]), backgroundColor: '#2563eb', borderRadius: 6, barThickness: 16 }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (ctx) => `Số tiền: ${ctx.raw.toLocaleString()}đ` } }
+                    },
+                    scales: { x: { display: false }, y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } } }
+                },
+                plugins: [{
+                    afterDatasetsDraw: (chart) => {
+                        const {ctx, data} = chart;
+                        ctx.save(); ctx.font = 'bold 9px Inter'; ctx.fillStyle = '#1e40af';
+                        chart.getDatasetMeta(0).data.forEach((bar, index) => {
+                            const val = data.datasets[0].data[index];
+                            const pct = ((val / total) * 100).toFixed(1) + '%';
+                            ctx.fillText(pct, bar.x + 5, bar.y + 4);
+                        });
+                    }
+                }]
+            });
+        }
+
+        // BIỂU ĐỒ 2: MIXED CHART (LINE FOR TOTAL + STACKED BARS FOR CATEGORIES)
+        function changeDrill(level) {
+            currentDrillLevel = level;
+            document.querySelectorAll('.drill-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`drill-${level}`).classList.add('active');
+            renderCombinedDrillChart();
+        }
+
+        function renderCombinedDrillChart() {
+            const timeMap = {};
+            const cats = [...new Set(filteredData.map(i => i.category))];
+
+            filteredData.forEach(i => {
+                const d = parseSheetDate(i.date);
+                let key;
+                if (currentDrillLevel === 'month') key = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
+                else if (currentDrillLevel === 'week') {
+                    const oneJan = new Date(d.getFullYear(), 0, 1);
+                    const weekNum = Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+                    key = `W${weekNum}-${d.getFullYear().toString().slice(-2)}`;
+                } else key = d.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'});
+
+                if (!timeMap[key]) { timeMap[key] = { total: 0, breakdown: {} }; cats.forEach(c => timeMap[key].breakdown[c] = 0); }
+                timeMap[key].total += i.amount;
+                timeMap[key].breakdown[i.category] += i.amount;
+            });
+
+            const sortedTimeKeys = Object.keys(timeMap).sort();
+            
+            // Dataset cho Cột Chồng
+            const barDatasets = cats.map((cat, idx) => ({
+                type: 'bar',
+                label: cat,
+                data: sortedTimeKeys.map(k => timeMap[k].breakdown[cat]),
+                backgroundColor: BLUE_PALETTE[idx % BLUE_PALETTE.length],
+                stack: 'Stack 0',
+                borderRadius: 2
+            }));
+
+            // Dataset cho Đường Tổng
+            const lineDataset = {
+                type: 'line',
+                label: 'Tổng chi tiêu',
+                data: sortedTimeKeys.map(k => timeMap[k].total),
+                borderColor: '#1e40af',
+                borderWidth: 2,
+                pointBackgroundColor: '#1e40af',
+                pointRadius: 3,
+                tension: 0.1,
+                fill: false,
+                datalabels: true // Marker để plugin nhận diện
+            };
+
+            if(chartInstances.drill) chartInstances.drill.destroy();
+            chartInstances.drill = new Chart(document.getElementById('drillChart'), {
+                data: { labels: sortedTimeKeys, datasets: [lineDataset, ...barDatasets] },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+                        y: { stacked: true, ticks: { font: { size: 8 }, callback: v => (v/1000) + 'k' } }
+                    }
+                },
+                plugins: [{
+                    // Plugin vẽ nhãn cho đường tổng
+                    afterDatasetsDraw: (chart) => {
+                        const {ctx} = chart;
+                        ctx.save();
+                        const lineMeta = chart.getDatasetMeta(0); // Dataset 0 là line
+                        ctx.font = 'bold 8px Inter';
+                        ctx.fillStyle = '#1e40af';
+                        ctx.textAlign = 'center';
+                        lineMeta.data.forEach((point, index) => {
+                            const val = chart.data.datasets[0].data[index];
+                            if (val > 0) {
+                                const label = (val/1000).toFixed(0) + 'k';
+                                ctx.fillText(label, point.x, point.y - 8);
+                            }
+                        });
+                    }
+                }]
+            });
+        }
+
+        // BIỂU ĐỒ 3: LŨY KẾ
+        function renderLineChart() {
+            const daily = {};
+            filteredData.forEach(i => { const k = parseSheetDate(i.date).toISOString().split('T')[0]; daily[k] = (daily[k] || 0) + i.amount; });
+            const s = Object.keys(daily).sort();
+            let sum = 0; const c = s.map(k => { sum += daily[k]; return sum; });
+            
+            if(chartInstances.line) chartInstances.line.destroy();
+            chartInstances.line = new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: s.map(k => k.split('-').reverse().slice(0,2).join('/')),
+                    datasets: [{ data: c, borderColor: '#2563eb', fill: true, backgroundColor: 'rgba(37, 99, 235, 0.05)', tension: 0.3, pointRadius: 0 }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 8 }, callback: v => v/1000 + 'k' } }, x: { ticks: { font: { size: 8 } } } } }
+            });
+        }
+
+        function renderTable() {
+            const b = document.getElementById('rawDataTable'); b.innerHTML = '';
+            filteredData.sort((x,y) => parseSheetDate(y.date) - parseSheetDate(x.date)).slice(0,15).forEach(i => {
+                b.innerHTML += `<tr><td class="py-3">${parseSheetDate(i.date).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</td><td class="py-3 font-semibold">${i.category}</td><td class="py-3 text-right font-bold text-blue-700">${i.amount.toLocaleString()}đ</td></tr>`;
+            });
+        }
+
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleLoading(true);
+            const p = new URLSearchParams();
+            p.append('date', document.getElementById('date').value);
+            p.append('category', document.getElementById('category').value);
+            p.append('amount', document.getElementById('amount').value);
+            p.append('note', document.getElementById('note').value);
+            p.append('action', 'append');
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', body: p, mode: 'no-cors' });
+                document.getElementById('expenseForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                alert("✅ Ghi thành công!");
+                fetchData(); 
+            } catch (err) { alert("Lỗi kết nối!"); }
+            finally { toggleLoading(false); }
+        });
+
+        function toggleLoading(s) { document.getElementById('loading').classList.toggle('hidden', !s); }
+        
+        // Khởi chạy
+        document.getElementById('date').valueAsDate = new Date();
+        fetchData();
+    </script>
+</body>
+</html>
