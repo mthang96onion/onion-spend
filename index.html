@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Onion's Spend</title>
-
     <link rel="icon" type="image/png" href="icon.png">
-    
-    <!-- 2. ICON KHI LƯU RA MÀN HÌNH CHÍNH (IOS & ANDROID) -->
-    <!-- Tôi sử dụng một icon chuyên nghiệp màu xanh dương từ internet -->
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,100 +13,234 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .tab-active { color: #1d4ed8; border-bottom: 3px solid #1d4ed8; }
-        .card { background: white; border-radius: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        input, select, textarea { border: 1px solid #cbd5e1 !important; outline: none; }
-        input:focus, select:focus, textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
-        .loading-overlay { background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); }
-        .blue-gradient { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
-        .cat-checkbox:checked + label { background-color: #dbeafe; color: #1e40af; border-color: #3b82f6; }
+        :root {
+            --primary-blue: #0ea5e9; 
+            --primary-dark: #0284c7; 
+            --bg-color: #f0f9ff;     
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.5);
+        }
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            background-attachment: fixed;
+            color: #334155; 
+        }
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(14, 165, 233, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-header {
+            background: rgba(14, 165, 233, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.6);
+        }
+
+        input, select, textarea { 
+            border: 2px solid transparent !important; 
+            outline: none; 
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary-blue) !important; 
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15); 
+            background: #fff;
+        }
+
+        .tab-active { color: var(--primary-blue); position: relative; }
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 4px;
+            animation: bounceIn 0.3s ease;
+        }
+        .nav-btn { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-btn:active { transform: scale(0.9); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4); }
+
+        .cat-checkbox:checked + label { 
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9); 
+            color: white; 
+            border-color: transparent; 
+            box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+            transform: translateY(-2px);
+        }
+        .cat-checkbox:not(:checked) + label {
+            opacity: 0.6;
+        }
+        .filter-label { transition: all 0.2s ease; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .drill-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .hidden-tab { display: none !important; }
+
+        .timeline-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounceIn { 0% { width: 0; opacity: 0; } 100% { width: 24px; opacity: 1; } }
+
+        .loading-overlay { background: rgba(255,255,255,0.8); backdrop-filter: blur(6px); }
+        .cloud-bounce { animation: float 2s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28 min-h-screen">
 
-    <!-- Màn hình tải -->
+    <!-- Cấu hình hệ thống (Modal) -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-sky-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-sky-100">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-sky-700 font-black text-lg flex items-center gap-2"><i class="fas fa-shield-alt text-sky-400"></i> Lõi Hệ Thống AI</h3>
+                <button onclick="closeSettings()" class="text-slate-300 hover:text-slate-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-extrabold text-sky-600 uppercase mb-2">Gemini API Key</label>
+                    <input type="password" id="gemini-key-input" placeholder="Dán API Key vào đây..." class="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-700 shadow-inner">
+                    <p class="text-[10px] text-slate-400 mt-2.5 font-semibold">Chìa khóa này lưu 100% nội bộ trên trình duyệt máy bạn, không được gửi đi bất kỳ đâu trừ Google. Cực kỳ an toàn.</p>
+                </div>
+                <button onclick="saveSettings()" class="w-full btn-primary font-black py-3.5 rounded-xl shadow-lg shadow-sky-500/30 uppercase text-xs tracking-wide">
+                    Đã Ghi Nhận
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen Sync Loader -->
     <div id="loading" class="fixed inset-0 loading-overlay z-50 flex items-center justify-center hidden">
         <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600"></div>
-            <p class="mt-3 text-blue-700 font-bold text-sm text-center px-4">Đang đồng bộ dữ liệu...<br><span class="text-[10px] font-normal opacity-70">Vui lòng đợi giây lát</span></p>
+            <i class="fas fa-cloud text-sky-400 text-5xl cloud-bounce mb-3 drop-shadow-md"></i>
+            <p class="text-sky-700 font-extrabold text-sm text-center px-4">Đang lên mây lưu dữ liệu...</p>
         </div>
     </div>
 
-    <!-- Header -->
-    <div class="blue-gradient text-white p-6 rounded-b-[2rem] shadow-lg mb-6 sticky top-0 z-30">
+    <div class="glass-header text-white p-6 rounded-b-[2.5rem] shadow-xl mb-6 sticky top-0 z-30">
         <div class="flex justify-between items-center max-w-md mx-auto">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">Onion's Blue 💸</h1>
-                <p class="text-blue-100 text-[10px] font-medium uppercase tracking-widest opacity-80" id="sync-status">Sẵn sàng</p>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
+                    <i class="fas fa-seedling text-xl shadow-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight drop-shadow-md">Onion's Spend</h1>
+                    <p class="text-sky-100 text-[11px] font-bold uppercase tracking-widest opacity-90 mt-0.5" id="sync-status">Hành lý sẵn sàng</p>
+                </div>
             </div>
-            <button onclick="fetchData()" class="bg-white/20 p-2 rounded-lg backdrop-blur-sm active:scale-90 transition-all">
-                <i class="fas fa-redo-alt"></i>
-            </button>
+            
+            <div class="flex gap-2">
+                <button onclick="openSettings()" class="bg-white/20 w-10 h-10 rounded-xl backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20 transition-transform active:scale-90 relative">
+                    <i class="fas fa-cog"></i>
+                    <span id="ai-key-dot" class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full hidden animate-pulse"></span>
+                </button>
+                <button onclick="fetchData()" class="bg-white/20 w-10 h-10 rounded-xl backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20 transition-transform active:scale-90">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="px-4 max-w-md mx-auto space-y-6">
-        
-        <!-- Tab Nhập Liệu -->
-        <div id="tab-input-content" class="space-y-4">
-            <div class="card p-6">
-                <h2 class="text-md font-bold mb-5 text-slate-800 flex items-center">
-                    <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-3">
-                        <i class="fas fa-plus"></i>
+    <div class="px-5 max-w-md mx-auto space-y-6 relative z-10">
+
+        <!-- TAB: INPUT -->
+        <div id="tab-input-content" class="fade-in space-y-5">
+            <div class="glass-card p-6">
+                <h2 class="text-lg font-extrabold mb-5 text-slate-800 flex items-center gap-3">
+                    <span class="w-9 h-9 bg-sky-100 text-sky-500 rounded-xl flex items-center justify-center shadow-inner">
+                        <i class="fas fa-feather-alt"></i>
                     </span>
-                    Ghi Chép Mới
+                    Nhật Ký Hành Trình
                 </h2>
-                <form id="expenseForm" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ngày</label>
-                            <input type="date" id="date" required class="w-full p-2.5 rounded-lg text-sm bg-slate-50 border-none">
+                <form id="expenseForm" class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="block text-[11px] font-extrabold text-sky-600 uppercase mb-1.5 ml-1">Ngày giờ</label>
+                            <input type="date" id="date" required class="w-full p-3 rounded-xl text-sm font-semibold text-slate-700 shadow-sm">
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Loại chi</label>
-                            <select id="category" required class="w-full p-2.5 rounded-lg text-sm bg-slate-50 border-none">
+                        <div class="relative">
+                            <label class="block text-[11px] font-extrabold text-sky-600 uppercase mb-1.5 ml-1">Phân loại</label>
+                            <select id="category" required class="w-full p-3 rounded-xl text-sm font-semibold text-slate-700 shadow-sm appearance-none">
                                 <option value="Ăn uống">Ăn uống</option>
                                 <option value="Ăn chơi">Ăn chơi</option>
                                 <option value="Tiền nhà">Tiền nhà</option>
                                 <option value="Đi lại">Đi lại</option>
                                 <option value="Mua sắm">Mua sắm</option>
-                                <option value="Du lịch">Dịch vụ</option>
+                                <option value="Dịch vụ">Dịch vụ</option>
                                 <option value="Quà tặng">Quà tặng</option>
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Số tiền (VND)</label>
-                        <input type="number" id="amount" placeholder="Nhập số tiền..." required class="w-full p-3 rounded-lg text-lg font-bold text-blue-700 bg-slate-50 border-none">
+                        <label class="block text-[11px] font-extrabold text-sky-600 uppercase mb-1.5 ml-1">Kinh phí (VND)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-coins text-sky-400"></i>
+                            </div>
+                            <input type="number" id="amount" placeholder="Nhập số tiền..." required class="w-full pl-10 p-3.5 rounded-xl text-xl font-black text-sky-600 shadow-sm">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ghi chú</label>
-                        <textarea id="note" rows="2" placeholder="Ghi chú thêm..." class="w-full p-3 rounded-lg text-sm bg-slate-50 border-none"></textarea>
+                        <label class="block text-[11px] font-extrabold text-sky-600 uppercase mb-1.5 ml-1">Câu chuyện / Ghi chú</label>
+                        <div class="relative">
+                            <div class="absolute top-3.5 left-0 pl-4 pointer-events-none">
+                                <i class="fas fa-comment-dots text-sky-400"></i>
+                            </div>
+                            <textarea id="note" rows="2" placeholder="Lang thang trên phố..." class="w-full pl-10 p-3.5 rounded-xl text-sm font-semibold text-slate-700 shadow-sm"></textarea>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full blue-gradient text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition-all mt-2 uppercase text-sm">
-                        Lưu vào Google Sheet
+                    <button type="submit" class="w-full btn-primary font-black py-4 rounded-2xl shadow-lg shadow-sky-500/30 mt-4 uppercase text-sm tracking-wide flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane text-lg"></i> Gửi Hành Trình
                     </button>
                 </form>
             </div>
+            
+            <div class="text-center pt-2">
+                <i class="fas fa-leaf text-sky-200 text-4xl opacity-60 drop-shadow-sm animate-pulse"></i>
+            </div>
         </div>
 
-        <!-- Tab Thống Kê -->
-        <div id="tab-stats-content" class="hidden space-y-5">
+        <!-- TAB: STATS -->
+        <div id="tab-stats-content" class="hidden-tab fade-in space-y-5">
+            
             <!-- Filter Section -->
-            <div class="card p-4 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase">Bộ lọc nâng cao</h3>
-                    <i class="fas fa-filter text-blue-600"></i>
+            <div class="glass-card p-5 space-y-4">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-xs font-extrabold text-sky-600 uppercase tracking-wide">La Bàn Thời Gian</h3>
+                    <i class="fas fa-compass text-sky-500 text-lg animate-pulse"></i>
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2">Phạm vi thời gian</label>
-                        <select id="filter-period" onchange="handlePeriodChange()" class="w-full p-2.5 rounded-lg text-xs font-semibold bg-slate-50">
+                        <select id="filter-period" onchange="handlePeriodChange()" class="w-full p-3 rounded-xl text-sm font-bold text-slate-700 shadow-sm appearance-none bg-white hover:bg-sky-50 transition-colors">
                             <option value="this_month" selected>Tháng này</option>
                             <option value="last_month">Tháng trước</option>
                             <option value="this_week">Tuần này</option>
@@ -121,104 +251,167 @@
                             <option value="last_30_days">30 ngày qua</option>
                             <option value="today">Hôm nay</option>
                             <option value="all">Tất cả thời gian</option>
-                            <option value="custom">Tùy chỉnh ngày...</option>
+                            <option value="custom">Chuyến đi tùy chỉnh...</option>
                         </select>
                     </div>
-                    <div id="custom-date-box" class="hidden grid grid-cols-2 gap-2 p-2 bg-blue-50 rounded-lg">
-                        <input type="date" id="start-date" class="p-2 rounded text-[10px]">
-                        <input type="date" id="end-date" class="p-2 rounded text-[10px]">
-                        <button onclick="applyFilters()" class="col-span-2 py-1.5 bg-blue-600 text-white text-[10px] font-bold rounded uppercase">Áp dụng</button>
+                    <div id="custom-date-box" class="hidden grid grid-cols-2 gap-3 p-3 bg-white/50 rounded-xl border border-sky-100 shadow-inner">
+                        <input type="date" id="start-date" class="p-2.5 rounded-lg text-xs font-bold text-slate-600">
+                        <input type="date" id="end-date" class="p-2.5 rounded-lg text-xs font-bold text-slate-600">
+                        <button onclick="applyFilters()" class="col-span-2 py-2 btn-primary text-white text-xs font-black rounded-lg uppercase tracking-wide hover:shadow-lg transition-all">Khám Phá</button>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-2">Danh mục</label>
+                        <h3 class="text-[10px] font-extrabold text-sky-500 uppercase mb-2.5 ml-1">Công Tắc Phân Loại</h3>
                         <div id="category-multi-box" class="flex flex-wrap gap-2"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- KPIs -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="card p-4 text-center border-t-4 border-blue-600">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">Tổng chi tiêu</p>
-                    <p id="totalExpense" class="text-md font-bold text-slate-800">0đ</p>
+            <!-- Khối AI -->
+            <div class="glass-card overflow-hidden">
+                <div class="bg-gradient-to-r from-sky-50 to-white px-5 py-3.5 border-b border-sky-100 flex justify-between items-center">
+                    <h3 class="text-[11px] font-extrabold text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fas fa-robot text-sky-500"></i> AI Soi Chiếu
+                    </h3>
+                    <button onclick="generateInsight()" class="px-3 py-1.5 bg-sky-500 text-white rounded-lg text-[9px] font-bold uppercase shadow shadow-sky-500/30 hover:bg-sky-600 active:scale-95 transition-all">
+                        Phân Tích Xu Hướng
+                    </button>
                 </div>
-                <div class="card p-4 text-center border-t-4 border-blue-400">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">Trung bình/Ngày</p>
-                    <p id="avgDaily" class="text-md font-bold text-slate-800">0đ</p>
+                <div id="ai-insight-box" class="p-5 text-[13px] text-slate-600 font-semibold leading-relaxed">
+                    <p class="text-center text-slate-400 text-xs italic">Bấm "Phân Tích" để so sánh số liệu chu kỳ này và chu kỳ trước.</p>
                 </div>
             </div>
 
-            <!-- Category Bar Chart -->
-            <div class="card p-4">
-                <h3 class="text-[10px] font-bold mb-4 text-slate-400 uppercase text-center">Cơ cấu danh mục (%)</h3>
-                <div class="h-64"><canvas id="categoryBarChart"></canvas></div>
-            </div>
-
-            <!-- Combined Spending Chart (Line + Stacked Bar) -->
-            <div class="card p-4 space-y-4">
-                <div class="flex flex-col space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-[10px] font-bold text-slate-400 uppercase">Chi tiêu theo thời gian</h3>
-                        <div class="flex bg-slate-100 p-0.5 rounded-lg">
-                            <button onclick="changeDrill('month')" id="drill-month" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all active uppercase">Tháng</button>
-                            <button onclick="changeDrill('week')" id="drill-week" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all uppercase">Tuần</button>
-                            <button onclick="changeDrill('day')" id="drill-day" class="drill-btn px-2 py-1 text-[9px] font-bold rounded-md transition-all uppercase">Ngày</button>
-                        </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card p-5 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 opacity-10">
+                        <i class="fas fa-fire text-6xl text-sky-500"></i>
                     </div>
-                    <p class="text-[8px] text-slate-400 italic">Đường: Tổng chi | Cột: Chi tiết từng loại</p>
+                    <p class="text-[10px] font-black text-sky-600 uppercase tracking-tighter mb-1.5 relative z-10">Tổng Kinh Phí</p>
+                    <p id="totalExpense" class="text-xl font-black text-slate-800 relative z-10 drop-shadow-sm">0đ</p>
                 </div>
-                <div class="h-72"><canvas id="drillChart"></canvas></div>
+                <div class="glass-card p-5 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="absolute -right-2 -bottom-2 opacity-10">
+                        <i class="fas fa-sun text-6xl text-amber-500"></i>
+                    </div>
+                    <p class="text-[10px] font-black text-sky-600 uppercase tracking-tighter mb-1.5 relative z-10">Tốc Độ / Ngày</p>
+                    <p id="avgDaily" class="text-xl font-black text-slate-800 relative z-10 drop-shadow-sm">0đ</p>
+                </div>
             </div>
 
-            <!-- Cumulative Line Chart -->
-            <div class="card p-4">
-                <h3 class="text-[10px] font-bold mb-4 text-slate-400 uppercase text-center">Xu hướng tích lũy</h3>
-                <div class="h-48"><canvas id="lineChart"></canvas></div>
+            <!-- Mạng Nhện: Hệ Phái Lối Sống -->
+            <div class="glass-card p-5 transition-shadow relative overflow-hidden">
+                <h3 class="text-[11px] font-extrabold mb-2 text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fas fa-spider text-sky-400"></i> Hệ Phái Lối Sống
+                </h3>
+                <p class="text-[10px] text-slate-400 font-bold mb-4">Hình dáng mạng nhện tiết lộ thói quen tiêu dùng</p>
+                <div class="h-56"><canvas id="radarChart"></canvas></div>
             </div>
 
-            <!-- Raw Data Table -->
-            <div class="card p-4 overflow-hidden">
-                <h3 class="text-[10px] font-bold mb-3 text-slate-400 uppercase">Lịch sử giao dịch gần nhất</h3>
+            <!-- Vòng Tròn: Tỉ trọng Hành Trang -->
+            <div class="glass-card p-5">
+                <h3 class="text-[11px] font-extrabold mb-4 text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-sky-400"></i> Tỉ Lệ Hành Trang
+                </h3>
+                <div class="h-48 relative"><canvas id="doughnutChart"></canvas></div>
+            </div>
+
+            <!-- Đồng hồ sinh học (Bản Đồ Nhịp Độ) -->
+            <div class="glass-card p-5">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-[11px] font-extrabold text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fas fa-calendar-day text-sky-400"></i> Đồng Hồ Sinh Học
+                    </h3>
+                    <select id="biorhythm-mode" onchange="changeBiorhythmMode()" class="text-[9px] font-bold bg-sky-50 text-sky-600 px-2 py-1.5 rounded-lg border-none outline-none appearance-none cursor-pointer hover:bg-sky-100 transition-colors">
+                        <option value="weekday">Theo Thứ</option>
+                        <option value="monthday">Theo Ngày Trong Tháng</option>
+                    </select>
+                </div>
+                <p class="text-[10px] text-slate-400 font-bold mb-4">Cột màu <span class="text-rose-500">Đỏ</span> là thời điểm hay chốt đơn nhất</p>
+                <div class="h-48"><canvas id="biorhythmChart"></canvas></div>
+            </div>
+
+            <!-- Dòng chảy thời gian: Nhịp Độ Lưu Dấu -->
+            <div class="glass-card p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-[11px] font-extrabold text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fas fa-water text-sky-400"></i> Dòng Chảy Hành Trình
+                    </h3>
+                </div>
+                <!-- Nút Tùy Chỉnh Thời Gian -->
+                <div class="flex bg-sky-100/50 p-1 rounded-xl shadow-inner mb-4 w-full">
+                    <button onclick="changeTimelineMode('day')" id="timeline-btn-day" class="timeline-btn active flex-1 py-1.5 text-[9px] font-bold rounded-lg transition-all text-white bg-sky-500 shadow-sm uppercase">Ngày</button>
+                    <button onclick="changeTimelineMode('week')" id="timeline-btn-week" class="timeline-btn flex-1 py-1.5 text-[9px] font-bold rounded-lg transition-all text-slate-500 hover:text-sky-600 uppercase">Tuần</button>
+                    <button onclick="changeTimelineMode('month')" id="timeline-btn-month" class="timeline-btn flex-1 py-1.5 text-[9px] font-bold rounded-lg transition-all text-slate-500 hover:text-sky-600 uppercase">Tháng</button>
+                    <button onclick="changeTimelineMode('year')" id="timeline-btn-year" class="timeline-btn flex-1 py-1.5 text-[9px] font-bold rounded-lg transition-all text-slate-500 hover:text-sky-600 uppercase">Năm</button>
+                </div>
+                <div class="h-56"><canvas id="timelineChart"></canvas></div>
+            </div>
+
+            <!-- Lịch sử (Table) -->
+            <div class="glass-card p-5 overflow-hidden">
+                <h3 class="text-[11px] font-extrabold mb-4 text-sky-700 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fas fa-shoe-prints text-sky-400"></i> Dấu Chân Gần Nhất
+                </h3>
                 <div class="overflow-x-auto no-scrollbar">
-                    <table class="w-full text-[11px] text-left">
+                    <table class="w-full text-xs text-left">
                         <thead>
-                            <tr class="text-slate-400 border-b border-slate-50">
-                                <th class="pb-2">Ngày</th>
-                                <th class="pb-2">Loại</th>
-                                <th class="pb-2 text-right">Số tiền</th>
+                            <tr class="text-sky-600 border-b border-sky-100 uppercase text-[10px] font-black">
+                                <th class="pb-3 w-1/4">Ngày</th>
+                                <th class="pb-3 w-1/3">Hành lý</th>
+                                <th class="pb-3 text-right">Chi phí</th>
                             </tr>
                         </thead>
-                        <tbody id="rawDataTable" class="text-slate-700 divide-y divide-slate-50"></tbody>
+                        <tbody id="rawDataTable" class="text-slate-700 divide-y divide-sky-50"></tbody>
                     </table>
                 </div>
             </div>
+            
+            <div class="pb-6"></div>
         </div>
     </div>
 
-    <!-- Thanh Điều Hướng Dưới -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t flex justify-around p-3 shadow-2xl z-40">
-        <button onclick="switchTab('input')" id="btn-input" class="flex flex-col items-center tab-active w-1/2">
-            <i class="fas fa-edit text-xl"></i>
-            <span class="text-[9px] font-black mt-1 uppercase">Nhập liệu</span>
+    <div class="fixed bottom-0 left-0 right-0 glass-nav flex justify-around p-2 pb-6 shadow-[0_-10px_40px_rgba(14,165,233,0.1)] z-40 rounded-t-[2.5rem]">
+        <button onclick="switchTab('input')" id="btn-input" class="nav-btn flex flex-col items-center tab-active w-1/2 p-2 relative">
+            <i class="fas fa-feather-alt text-[22px] mb-1.5 drop-shadow-sm"></i>
+            <span class="text-[10px] font-black uppercase tracking-wider relative z-10">Bút Ký</span>
         </button>
-        <button onclick="switchTab('stats')" id="btn-stats" class="flex flex-col items-center text-slate-400 w-1/2">
-            <i class="fas fa-chart-line text-xl"></i>
-            <span class="text-[9px] font-black mt-1 uppercase">Thống kê</span>
+        <button onclick="switchTab('stats')" id="btn-stats" class="nav-btn flex flex-col items-center text-slate-400 w-1/2 p-2 transition-colors relative">
+            <i class="fas fa-map-marked-alt text-[22px] mb-1.5 drop-shadow-sm"></i>
+            <span class="text-[10px] font-black uppercase tracking-wider relative z-10">Bản Đồ</span>
         </button>
     </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHKN-MOL4JMugIX8628RX3L2JPkg6sXD6x3Apeiwb-oIaHVUlpRg9KlusSJxzQ423T/exec'; 
-        const BLUE_PALETTE = ['#1e40af', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe', '#eff6ff'];
+        
+        Chart.defaults.font.family = "'Nunito', sans-serif";
+        Chart.defaults.color = '#64748b';
 
-        let allData = [];
-        let filteredData = [];
-        let chartInstances = {};
-        let currentDrillLevel = 'month';
-        let currentPeriodDays = 1;
-        let allCategoriesInSheet = [];
+        const CAT_COLORS = {
+            'Ăn uống': '#f59e0b',  
+            'Ăn chơi': '#ec4899',  
+            'Tiền nhà': '#8b5cf6', 
+            'Đi lại': '#0ea5e9',   
+            'Mua sắm': '#f43f5e',  
+            'Dịch vụ': '#10b981',  
+            'Quà tặng': '#f97316', 
+            'Khác': '#94a3b8'      
+        };
+        const getCatColor = (cat) => CAT_COLORS[cat] || '#38bdf8';
 
-        function parseSheetDate(dateInput) {
+        const AppState = {
+            allData: [],
+            filteredData: [],
+            chartInstances: {},
+            currentPeriodDays: 1,
+            allCategoriesInSheet: [],
+            timelineMode: 'day',
+            biorhythmMode: 'weekday',
+            activeFilterStart: new Date(),
+            activeFilterEnd: new Date()
+        };
+
+        const parseSheetDate = (dateInput) => {
             if (!dateInput) return new Date(0);
             if (dateInput instanceof Date) return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
             const s = String(dateInput);
@@ -226,34 +419,59 @@
             if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
             m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
             if (m) return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
-            const d = new Date(s);
-            return isNaN(d.getTime()) ? new Date(0) : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            return isNaN(new Date(s).getTime()) ? new Date(0) : new Date(s);
+        };
+
+        const toggleLoading = (s) => document.getElementById('loading').classList.toggle('hidden', !s);
+
+        // --- Settings Management ---
+        function openSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            const key = localStorage.getItem('geminiKey');
+            if(key) document.getElementById('gemini-key-input').value = key;
         }
 
-        function updateCategoryFilterUI() {
-            const container = document.getElementById('category-multi-box');
-            container.innerHTML = '';
-            allCategoriesInSheet = [...new Set(allData.map(item => String(item.category || "Khác").trim()))].sort();
-            allCategoriesInSheet.forEach((cat, index) => {
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <input type="checkbox" id="cat-${index}" value="${cat}" class="hidden cat-checkbox" checked onchange="applyFilters()">
-                    <label for="cat-${index}" class="px-3 py-1.5 border border-slate-200 rounded-full text-[10px] font-bold cursor-pointer transition-all block whitespace-nowrap">
-                        ${cat}
-                    </label>
-                `;
-                container.appendChild(div);
-            });
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+            checkAIKey(); // update dot
         }
 
+        function saveSettings() {
+            const val = document.getElementById('gemini-key-input').value.trim();
+            if(val) localStorage.setItem('geminiKey', val);
+            else localStorage.removeItem('geminiKey');
+            closeSettings();
+        }
+
+        function checkAIKey() {
+            if(!localStorage.getItem('geminiKey')) {
+                document.getElementById('ai-key-dot').classList.remove('hidden');
+            } else {
+                document.getElementById('ai-key-dot').classList.add('hidden');
+            }
+        }
+
+        // --- Tabs ---
         function switchTab(tab) {
-            document.getElementById('tab-input-content').classList.toggle('hidden', tab !== 'input');
-            document.getElementById('tab-stats-content').classList.toggle('hidden', tab !== 'stats');
-            document.getElementById('btn-input').classList.toggle('tab-active', tab === 'input');
-            document.getElementById('btn-input').classList.toggle('text-gray-400', tab !== 'input');
-            document.getElementById('btn-stats').classList.toggle('tab-active', tab === 'stats');
-            document.getElementById('btn-stats').classList.toggle('text-gray-400', tab !== 'stats');
-            if(tab === 'stats' && allData.length === 0) fetchData();
+            document.getElementById('tab-input-content').classList.toggle('hidden-tab', tab !== 'input');
+            document.getElementById('tab-stats-content').classList.toggle('hidden-tab', tab !== 'stats');
+            
+            const btnInput = document.getElementById('btn-input');
+            const btnStats = document.getElementById('btn-stats');
+            
+            if(tab === 'input') {
+                btnInput.classList.add('tab-active');
+                btnInput.classList.remove('text-slate-400');
+                btnStats.classList.remove('tab-active');
+                btnStats.classList.add('text-slate-400');
+            } else {
+                btnStats.classList.add('tab-active');
+                btnStats.classList.remove('text-slate-400');
+                btnInput.classList.remove('tab-active');
+                btnInput.classList.add('text-slate-400');
+                if(AppState.allData.length === 0) fetchData();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function fetchData() {
@@ -261,19 +479,43 @@
             try {
                 const res = await fetch(SCRIPT_URL + '?action=get', { method: 'GET', redirect: 'follow' });
                 const raw = await res.json();
-                allData = raw.map(item => ({
+                AppState.allData = raw.map(item => ({
                     ...item,
                     category: String(item.category || "Khác").trim(),
                     amount: Number(item.amount) || 0
                 }));
-                document.getElementById('sync-status').innerText = "Đã cập nhật lúc " + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+                document.getElementById('sync-status').innerText = "Cập nhật lúc " + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
                 updateCategoryFilterUI();
                 applyFilters();
             } catch (e) {
-                alert("Lỗi đồng bộ dữ liệu!");
+                alert("Lỗi kết nối. Gió to quá mạng rớt rồi!");
             } finally {
                 toggleLoading(false);
             }
+        }
+
+        function updateCategoryFilterUI() {
+            const container = document.getElementById('category-multi-box');
+            container.innerHTML = '';
+            AppState.allCategoriesInSheet = [...new Set(AppState.allData.map(item => String(item.category || "Khác").trim()))].sort();
+            
+            // Lọc bỏ hẳn thuộc tính bị loại khỏi DB lưu (Du Lịch)
+            AppState.allCategoriesInSheet = AppState.allCategoriesInSheet.filter(cat => cat.toLowerCase() !== 'du lịch');
+            
+            AppState.allCategoriesInSheet.forEach((cat, index) => {
+                const color = getCatColor(cat);
+                const isGift = cat.toLowerCase() === 'quà tặng';
+                const checkedAttr = isGift ? '' : 'checked'; // Quà Tặng được TẮT MẶC ĐỊNH
+                
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="checkbox" id="cat-${index}" value="${cat}" class="hidden cat-checkbox" ${checkedAttr} onchange="applyFilters()">
+                    <label for="cat-${index}" class="filter-label px-3.5 py-1.5 bg-white/60 border border-sky-100 rounded-xl text-[11px] font-bold text-sky-700 cursor-pointer block whitespace-nowrap shadow-sm hover:bg-white transition-all">
+                        <i class="fas fa-circle mr-1" style="color: ${color}; font-size: 8px; vertical-align: middle;"></i> ${cat}
+                    </label>
+                `;
+                container.appendChild(div);
+            });
         }
 
         function handlePeriodChange() {
@@ -330,13 +572,18 @@
 
             const fStart = new Date(start); fStart.setHours(0,0,0,0);
             const fEnd = new Date(end); fEnd.setHours(23,59,59,999);
+            
+            AppState.activeFilterStart = fStart;
+            AppState.activeFilterEnd = fEnd;
 
-            currentPeriodDays = isPast ? 
+            AppState.currentPeriodDays = isPast ? 
                 Math.ceil(Math.abs(fEnd - fStart) / 86400000) || 1 :
                 Math.ceil(Math.abs(now - fStart) / 86400000) + 1;
 
-            filteredData = allData.filter(item => {
+            AppState.filteredData = AppState.allData.filter(item => {
                 const itemDate = parseSheetDate(item.date);
+                if(item.category.toLowerCase() === 'du lịch') return false;
+
                 return itemDate >= fStart && itemDate <= fEnd &&
                        (selectedCats.length === 0 || selectedCats.includes(item.category));
             });
@@ -344,163 +591,326 @@
             updateDashboard();
         }
 
-        function updateDashboard() {
-            const total = filteredData.reduce((s, i) => s + i.amount, 0);
-            document.getElementById('totalExpense').innerText = total.toLocaleString() + 'đ';
-            document.getElementById('avgDaily').innerText = Math.round(total / currentPeriodDays).toLocaleString() + 'đ';
+        // --- AI Thẩm Định Logic ---
+        async function generateInsight() {
+            const key = localStorage.getItem('geminiKey');
+            if(!key) {
+                openSettings();
+                return;
+            }
 
-            renderCategoryBar();
-            renderCombinedDrillChart(); // BIỂU ĐỒ MỚI
-            renderLineChart();
+            const box = document.getElementById('ai-insight-box');
+            box.innerHTML = `<div class="flex items-center justify-center p-4"><i class="fas fa-spinner fa-spin text-sky-500 text-2xl mr-3"></i> <span class="text-xs font-bold text-sky-600">AI đang lập báo cáo so sánh...</span></div>`;
+
+            const fStart = AppState.activeFilterStart;
+            const fEnd = AppState.activeFilterEnd;
+            const span = fEnd.getTime() - fStart.getTime();
+            
+            // Tính toán Kỳ trước với khoảng thời gian tương đương (VD: Tháng Này -> lùi đúng 30 ngày)
+            const prevEnd = new Date(fStart.getTime() - 1);
+            const prevStart = new Date(prevEnd.getTime() - span);
+            
+            const currentCats = {};
+            const prevCats = {};
+            const selectedCats = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => cb.value);
+
+            AppState.allData.forEach(item => {
+                const itemDate = parseSheetDate(item.date);
+                const cat = item.category;
+                if(selectedCats.length > 0 && !selectedCats.includes(cat)) return;
+
+                if(itemDate >= fStart && itemDate <= fEnd) {
+                    currentCats[cat] = (currentCats[cat] || 0) + item.amount;
+                } else if(itemDate >= prevStart && itemDate <= prevEnd) {
+                    prevCats[cat] = (prevCats[cat] || 0) + item.amount;
+                }
+            });
+
+            const formatArr = (obj) => Object.entries(obj).filter(([_,v])=>v>0).map(([c, a]) => `${c}: ${Math.round(a/1000)}k`).join(', ');
+            let currentText = formatArr(currentCats) || "0đ";
+            let prevText = formatArr(prevCats) || "0đ";
+
+            const promptText = `Bạn là một Cố Vấn Tài Chính phân tích sắc bén và nghiêm túc nhưng lời lẽ gần gũi. 
+Dữ liệu chi tiêu của tôi được biểu diễn bằng hàng ngàn đồng (k).
+- Dữ liệu KỲ TRƯỚC (khoảng thời gian tương đương): ${prevText}
+- Dữ liệu KỲ HIỆN TẠI: ${currentText}
+
+Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đầu dòng:
+1. 📈 Xu Hướng: Chỉ chĩa thẳng vào tên danh mục nào ĐANG TĂNG mạnh hoặc giảm mạnh.
+2. ⚖️ Tình Hình: Mức độ rò rỉ ngân sách kỳ này so với kỳ trước.
+3. 🎯 Lời khuyên trọng tâm đi thẳng vào hành động cắt giảm.
+
+(Format bắt buộc: Dùng tiếng Việt chuẩn, không dùng ký tự Markdown dư thừa như **, dùng thẻ HTML cơ bản <b>, <br> nếu cần in đậm và xuống dòng). Đừng chào hỏi dông dài.`;
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{text: promptText}] }] })
+                });
+                const data = await res.json();
+                if(data.error) {
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi API: Khóa chưa đúng hoặc Hết lượt.</p>`;
+                    return;
+                }
+                let reply = data.candidates[0].content.parts[0].text;
+                // Cleanup text markup if AI accidentally sends **
+                reply = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                box.innerHTML = reply;
+            } catch(e) {
+                box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Mất kết nối tới trung tâm AI.</p>`;
+            }
+        }
+
+        // --- Core UI updates ---
+        function updateDashboard() {
+            const total = AppState.filteredData.reduce((s, i) => s + i.amount, 0);
+            document.getElementById('totalExpense').innerText = total.toLocaleString() + 'đ';
+            document.getElementById('avgDaily').innerText = Math.round(total / AppState.currentPeriodDays).toLocaleString() + 'đ';
+
+            // Reset box AI back to default logic
+            document.getElementById('ai-insight-box').innerHTML = `<p class="text-center text-slate-400 text-xs italic">Bấm "Phân Tích Xu Hướng" để so sánh số liệu chu kỳ này với chu kỳ liền trước đó.</p>`;
+
+            renderRadarChart();
+            renderDoughnutChart();
+            renderBiorhythmChart();
+            renderTimelineChart(); 
             renderTable();
         }
 
-        // BIỂU ĐỒ 1: CỘT NGANG VỚI LABEL %
-        function renderCategoryBar() {
-            const m = {}; filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
-            const sortedLabels = Object.keys(m).sort((a,b) => m[b] - m[a]);
-            const total = Object.values(m).reduce((a,b) => a+b, 0) || 1;
+        function renderRadarChart() {
+            const m = {}; AppState.filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
+            const labels = Object.keys(m);
+            const data = labels.map(l => m[l]);
 
-            if(chartInstances.cat) chartInstances.cat.destroy();
-            chartInstances.cat = new Chart(document.getElementById('categoryBarChart'), {
-                type: 'bar',
+            if(AppState.chartInstances.radar) AppState.chartInstances.radar.destroy();
+            
+            AppState.chartInstances.radar = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
                 data: {
-                    labels: sortedLabels,
-                    datasets: [{ data: sortedLabels.map(l => m[l]), backgroundColor: '#2563eb', borderRadius: 6, barThickness: 16 }]
+                    labels: labels.length ? labels : ['Chưa có'],
+                    datasets: [{
+                        label: 'Giá trị',
+                        data: data.length ? data : [0],
+                        backgroundColor: 'rgba(56, 189, 248, 0.3)',
+                        borderColor: '#0284c7',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0284c7',
+                        pointHoverBackgroundColor: '#e879f9',
+                        pointHoverBorderColor: '#fff',
+                        borderWidth: 2,
+                    }]
                 },
                 options: {
-                    indexAxis: 'y',
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { callbacks: { label: (ctx) => `Số tiền: ${ctx.raw.toLocaleString()}đ` } }
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(14, 165, 233, 0.15)' },
+                            grid: { color: 'rgba(14, 165, 233, 0.2)' },
+                            pointLabels: { font: { size: 10, family: 'Nunito', weight: '800' }, color: '#0369a1' },
+                            ticks: { display: false } 
+                        }
                     },
-                    scales: { x: { display: false }, y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } } }
-                },
-                plugins: [{
-                    afterDatasetsDraw: (chart) => {
-                        const {ctx, data} = chart;
-                        ctx.save(); ctx.font = 'bold 9px Inter'; ctx.fillStyle = '#1e40af';
-                        chart.getDatasetMeta(0).data.forEach((bar, index) => {
-                            const val = data.datasets[0].data[index];
-                            const pct = ((val / total) * 100).toFixed(1) + '%';
-                            ctx.fillText(pct, bar.x + 5, bar.y + 4);
-                        });
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', titleFont: {family: 'Nunito', weight: 'bold'} } 
                     }
-                }]
+                }
             });
         }
 
-        // BIỂU ĐỒ 2: MIXED CHART (LINE FOR TOTAL + STACKED BARS FOR CATEGORIES)
-        function changeDrill(level) {
-            currentDrillLevel = level;
-            document.querySelectorAll('.drill-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`drill-${level}`).classList.add('active');
-            renderCombinedDrillChart();
-        }
+        function renderDoughnutChart() {
+            const m = {}; AppState.filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
+            const labels = Object.keys(m).sort((a,b) => m[b] - m[a]);
+            const data = labels.map(l => m[l]);
+            const total = data.reduce((a,b) => a+b, 0) || 1;
+            const colors = labels.map(l => getCatColor(l));
 
-        function renderCombinedDrillChart() {
-            const timeMap = {};
-            const cats = [...new Set(filteredData.map(i => i.category))];
+            if(AppState.chartInstances.doughnut) AppState.chartInstances.doughnut.destroy();
 
-            filteredData.forEach(i => {
-                const d = parseSheetDate(i.date);
-                let key;
-                if (currentDrillLevel === 'month') key = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
-                else if (currentDrillLevel === 'week') {
-                    const oneJan = new Date(d.getFullYear(), 0, 1);
-                    const weekNum = Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-                    key = `W${weekNum}-${d.getFullYear().toString().slice(-2)}`;
-                } else key = d.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'});
+            const centerTextPlugin = {
+                id: 'centerText',
+                beforeDraw: function(chart) {
+                    if (data.length === 0) return;
+                    const {width, height, ctx} = chart;
+                    ctx.restore();
+                    const topLabel = labels[0];
+                    const topPct = Math.round((data[0]/total)*100) + '%';
+                    
+                    ctx.textBaseline = "middle";
+                    ctx.textAlign = "center";
+                    const x = width / 2;
+                    let y = height / 2;
+                    
+                    const isCompact = width < 250;
+                    if(isCompact) x = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left)/2;
 
-                if (!timeMap[key]) { timeMap[key] = { total: 0, breakdown: {} }; cats.forEach(c => timeMap[key].breakdown[c] = 0); }
-                timeMap[key].total += i.amount;
-                timeMap[key].breakdown[i.category] += i.amount;
-            });
-
-            const sortedTimeKeys = Object.keys(timeMap).sort();
-            
-            // Dataset cho Cột Chồng
-            const barDatasets = cats.map((cat, idx) => ({
-                type: 'bar',
-                label: cat,
-                data: sortedTimeKeys.map(k => timeMap[k].breakdown[cat]),
-                backgroundColor: BLUE_PALETTE[idx % BLUE_PALETTE.length],
-                stack: 'Stack 0',
-                borderRadius: 2
-            }));
-
-            // Dataset cho Đường Tổng
-            const lineDataset = {
-                type: 'line',
-                label: 'Tổng chi tiêu',
-                data: sortedTimeKeys.map(k => timeMap[k].total),
-                borderColor: '#1e40af',
-                borderWidth: 2,
-                pointBackgroundColor: '#1e40af',
-                pointRadius: 3,
-                tension: 0.1,
-                fill: false,
-                datalabels: true // Marker để plugin nhận diện
+                    ctx.font = "900 24px Nunito";
+                    ctx.fillStyle = getCatColor(topLabel); 
+                    ctx.fillText(topPct, x, y - 5);
+                    
+                    ctx.font = "800 12px Nunito";
+                    ctx.fillStyle = "#64748b";
+                    ctx.fillText(topLabel, x, y + 15);
+                    ctx.save();
+                }
             };
 
-            if(chartInstances.drill) chartInstances.drill.destroy();
-            chartInstances.drill = new Chart(document.getElementById('drillChart'), {
-                data: { labels: sortedTimeKeys, datasets: [lineDataset, ...barDatasets] },
+            AppState.chartInstances.doughnut = new Chart(document.getElementById('doughnutChart'), {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 3, borderColor: '#ffffff', hoverOffset: 6 }] },
                 options: {
+                    cutout: '75%',
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
-                        y: { stacked: true, ticks: { font: { size: 8 }, callback: v => (v/1000) + 'k' } }
+                    plugins: {
+                        legend: { position: 'right', labels: { usePointStyle: true, pointStyle: 'circle', font: {size: 11, family: 'Nunito', weight: 'bold'}, color: '#475569' } },
+                        tooltip: { callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString()}đ` }, backgroundColor: 'rgba(255,255,255,0.95)', titleColor: '#334155', bodyColor: '#0ea5e9', borderColor: '#e0f2fe', borderWidth: 1, padding: 10, cornerRadius: 10 }
                     }
                 },
-                plugins: [{
-                    // Plugin vẽ nhãn cho đường tổng
-                    afterDatasetsDraw: (chart) => {
-                        const {ctx} = chart;
-                        ctx.save();
-                        const lineMeta = chart.getDatasetMeta(0); // Dataset 0 là line
-                        ctx.font = 'bold 8px Inter';
-                        ctx.fillStyle = '#1e40af';
-                        ctx.textAlign = 'center';
-                        lineMeta.data.forEach((point, index) => {
-                            const val = chart.data.datasets[0].data[index];
-                            if (val > 0) {
-                                const label = (val/1000).toFixed(0) + 'k';
-                                ctx.fillText(label, point.x, point.y - 8);
-                            }
-                        });
-                    }
-                }]
+                plugins: [centerTextPlugin]
             });
         }
 
-        // BIỂU ĐỒ 3: LŨY KẾ
-        function renderLineChart() {
-            const daily = {};
-            filteredData.forEach(i => { const k = parseSheetDate(i.date).toISOString().split('T')[0]; daily[k] = (daily[k] || 0) + i.amount; });
-            const s = Object.keys(daily).sort();
-            let sum = 0; const c = s.map(k => { sum += daily[k]; return sum; });
+        function changeBiorhythmMode() {
+            AppState.biorhythmMode = document.getElementById('biorhythm-mode').value;
+            renderBiorhythmChart();
+        }
+
+        function renderBiorhythmChart() {
+            if(AppState.chartInstances.biorhythm) AppState.chartInstances.biorhythm.destroy();
+
+            let labels = [];
+            let data = [];
             
-            if(chartInstances.line) chartInstances.line.destroy();
-            chartInstances.line = new Chart(document.getElementById('lineChart'), {
+            if(AppState.biorhythmMode === 'weekday') {
+                const daysArr = new Array(7).fill(0);
+                AppState.filteredData.forEach(i => {
+                    daysArr[parseSheetDate(i.date).getDay()] += i.amount;
+                });
+                const orderMap = [1,2,3,4,5,6,0]; 
+                labels = ['T.2', 'T.3', 'T.4', 'T.5', 'T.6', 'T.7', 'CN'];
+                data = orderMap.map(idx => daysArr[idx]);
+            } else {
+                const monthArr = new Array(32).fill(0);
+                AppState.filteredData.forEach(i => {
+                    monthArr[parseSheetDate(i.date).getDate()] += i.amount;
+                });
+                labels = Array.from({length: 31}, (_, i) => String(i + 1));
+                data = monthArr.slice(1);
+            }
+
+            const maxVal = Math.max(...data);
+            const bgColors = data.map(v => v === maxVal && maxVal > 0 ? '#f43f5e' : '#bae6fd');
+            const hoverColors = data.map(v => v === maxVal && maxVal > 0 ? '#fb7185' : '#7dd3fc');
+
+            AppState.chartInstances.biorhythm = new Chart(document.getElementById('biorhythmChart'), {
+                type: 'bar',
+                data: { labels, datasets: [{ data, backgroundColor: bgColors, hoverBackgroundColor: hoverColors, borderRadius: AppState.biorhythmMode === 'weekday' ? 6 : 2, borderSkipped: false }] },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { display: false }, 
+                        x: { border: {display: false}, grid: {display: false}, ticks: {font: {size: AppState.biorhythmMode === 'weekday' ? 11 : 8, family: 'Nunito', weight: 'bold'}, color: '#64748b', maxTicksLimit: 31} }
+                    },
+                    plugins: { 
+                        legend: {display: false}, 
+                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString()}đ` } } 
+                    }
+                }
+            });
+        }
+
+        function changeTimelineMode(mode) {
+            AppState.timelineMode = mode;
+            document.querySelectorAll('.timeline-btn').forEach(b => {
+                b.classList.remove('active', 'text-white', 'bg-sky-500', 'shadow-sm');
+                b.classList.add('text-slate-500');
+            });
+            const activeBtn = document.getElementById(`timeline-btn-${mode}`);
+            activeBtn.classList.remove('text-slate-500');
+            activeBtn.classList.add('active', 'text-white', 'bg-sky-500', 'shadow-sm');
+            renderTimelineChart();
+        }
+
+        function renderTimelineChart() {
+            if(AppState.chartInstances.timeline) AppState.chartInstances.timeline.destroy();
+
+            const timeMap = {};
+            AppState.filteredData.forEach(i => { 
+                const d = parseSheetDate(i.date);
+                let key, labelStr;
+                if(AppState.timelineMode === 'day') {
+                    key = d.toISOString().split('T')[0];
+                    labelStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`;
+                } else if(AppState.timelineMode === 'week') {
+                    const oneJan = new Date(d.getFullYear(), 0, 1);
+                    const weekNum = Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+                    key = `${d.getFullYear()}-W${weekNum}`;
+                    labelStr = `Tuần ${weekNum}`;
+                } else if(AppState.timelineMode === 'month') {
+                    key = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
+                    labelStr = `Th. ${d.getMonth()+1}`;
+                } else if(AppState.timelineMode === 'year') {
+                    key = `${d.getFullYear()}`;
+                    labelStr = `${d.getFullYear()}`;
+                }
+
+                if(!timeMap[key]) timeMap[key] = { amount: 0, label: labelStr };
+                timeMap[key].amount += i.amount;
+            });
+
+            const sortedKeys = Object.keys(timeMap).sort();
+            const data = sortedKeys.map(k => timeMap[k].amount);
+            const labels = sortedKeys.map(k => timeMap[k].label);
+            
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            const gradientFill = ctx.createLinearGradient(0, 0, 0, 150);
+            gradientFill.addColorStop(0, "rgba(56, 189, 248, 0.4)");
+            gradientFill.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+
+            AppState.chartInstances.timeline = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: s.map(k => k.split('-').reverse().slice(0,2).join('/')),
-                    datasets: [{ data: c, borderColor: '#2563eb', fill: true, backgroundColor: 'rgba(37, 99, 235, 0.05)', tension: 0.3, pointRadius: 0 }]
+                data: { 
+                    labels, 
+                    datasets: [{ 
+                        data, 
+                        borderColor: '#0284c7', 
+                        borderWidth: 3, 
+                        fill: true, 
+                        backgroundColor: gradientFill, 
+                        tension: 0.4, 
+                        pointRadius: AppState.timelineMode === 'day' && data.length > 20 ? 0 : 3, 
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff', 
+                        pointBorderColor: '#0284c7' 
+                    }] 
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 8 }, callback: v => v/1000 + 'k' } }, x: { ticks: { font: { size: 8 } } } } }
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { border: {display:false}, grid: {color: 'rgba(14, 165, 233, 0.15)', drawTicks: false}, ticks: { font: {size: 9, weight: 'bold'}, callback: v => v/1000 + 'k' } },
+                        x: { border: {display:false}, grid: {display: false}, ticks: { font: {size: 9, weight: 'bold'}, maxTicksLimit: 7 } }
+                    },
+                    plugins: { 
+                        legend: {display: false}, 
+                        tooltip: { backgroundColor: 'rgba(2, 132, 199, 0.95)', padding: 10, cornerRadius: 8, intersect: false, mode: 'index' } 
+                    }
+                }
             });
         }
 
         function renderTable() {
             const b = document.getElementById('rawDataTable'); b.innerHTML = '';
-            filteredData.sort((x,y) => parseSheetDate(y.date) - parseSheetDate(x.date)).slice(0,15).forEach(i => {
-                b.innerHTML += `<tr><td class="py-3">${parseSheetDate(i.date).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</td><td class="py-3 font-semibold">${i.category}</td><td class="py-3 text-right font-bold text-blue-700">${i.amount.toLocaleString()}đ</td></tr>`;
+            AppState.filteredData.sort((x,y) => parseSheetDate(y.date) - parseSheetDate(x.date)).slice(0,10).forEach(i => {
+                const badgeColor = getCatColor(i.category);
+                b.innerHTML += `<tr class="hover:bg-white/50 transition-colors">
+                    <td class="py-3.5 font-bold text-slate-500">${parseSheetDate(i.date).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</td>
+                    <td class="py-3.5 font-extrabold flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${badgeColor};"></span>
+                        <span style="color: ${badgeColor};">${i.category}</span>
+                    </td>
+                    <td class="py-3.5 text-right font-black text-slate-700">${i.amount.toLocaleString()}đ</td>
+                </tr>`;
             });
         }
 
@@ -517,21 +927,19 @@
                 await fetch(SCRIPT_URL, { method: 'POST', body: p, mode: 'no-cors' });
                 document.getElementById('expenseForm').reset();
                 document.getElementById('date').valueAsDate = new Date();
-                alert("✅ Ghi thành công!");
+                
+                const statusInfo = document.getElementById('sync-status');
+                statusInfo.innerText = "Wow! Tuyệt vời 🥳";
+                setTimeout(() => statusInfo.innerText = "Hành lý sẵn sàng", 3500);
+
                 fetchData(); 
-            } catch (err) { alert("Lỗi kết nối!"); }
+            } catch (err) { alert("Lỗi kết nối. Mây mù che khuất sóng rồi!"); }
             finally { toggleLoading(false); }
         });
 
-        function toggleLoading(s) { document.getElementById('loading').classList.toggle('hidden', !s); }
-        
-        // Khởi chạy
         document.getElementById('date').valueAsDate = new Date();
+        checkAIKey(); // kiểm tra lần đầu khi bật app
         fetchData();
     </script>
 </body>
-
 </html>
-
-
-
