@@ -643,22 +643,32 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
 (Format bắt buộc: Dùng tiếng Việt chuẩn, không dùng ký tự Markdown dư thừa như **, dùng thẻ HTML cơ bản <b>, <br> nếu cần in đậm và xuống dòng). Đừng chào hỏi dông dài.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{text: promptText}] }] })
                 });
-                const data = await res.json();
-                if(data.error) {
-                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi API: Khóa chưa đúng hoặc Hết lượt.</p>`;
+
+                // Kiểm tra mã lỗi HTTP từ Network trước khi Parse JSON
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error("Network Detail:", errText);
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Từ chối truy cập (Mã ${res.status}): Bạn hãy kiểm tra lại kết nối mạng, Extension Adblock, hoặc Key API bị hạn chế quyền. <br><span class="opacity-60 text-[9px]">${errText.substring(0,60)}...</span></p>`;
                     return;
                 }
+
+                const data = await res.json();
+                if(data.error) {
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi máy chủ Google: ${data.error.message}</p>`;
+                    return;
+                }
+                
                 let reply = data.candidates[0].content.parts[0].text;
-                // Cleanup text markup if AI accidentally sends **
                 reply = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
                 box.innerHTML = reply;
             } catch(e) {
-                box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Mất kết nối tới trung tâm AI.</p>`;
+                console.error("Fetch Exception:", e);
+                box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi đường truyền Mạng/Trình duyệt: ${e.message}</p>`;
             }
         }
 
