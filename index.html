@@ -643,7 +643,7 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
 (Format bắt buộc: Dùng tiếng Việt chuẩn, không dùng ký tự Markdown dư thừa như **, dùng thẻ HTML cơ bản <b>, <br> nếu cần in đậm và xuống dòng). Đừng chào hỏi dông dài.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{text: promptText}] }] })
