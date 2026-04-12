@@ -592,6 +592,28 @@
         }
 
         // --- AI Thẩm Định Logic ---
+        async function getBestGeminiModel(key) {
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+                if (!res.ok) return 'gemini-2.0-flash';
+                const data = await res.json();
+                const available = (data.models || [])
+                    .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
+                    .map(m => m.name.split('/')[1]);
+                
+                // Độ ưu tiên tìm kiếm model mới nhất
+                const keywords = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                for(const kw of keywords) {
+                    const match = available.find(m => m.startsWith(kw));
+                    if(match) return match;
+                }
+                // Nếu không có flash, xài phế phẩm đầu tiên hỗ trợ generateContent
+                return available.length ? available[0] : 'gemini-2.0-flash';
+            } catch(e) {
+                return 'gemini-2.0-flash';
+            }
+        }
+
         async function generateInsight() {
             const key = localStorage.getItem('geminiKey');
             if(!key) {
@@ -600,7 +622,9 @@
             }
 
             const box = document.getElementById('ai-insight-box');
-            box.innerHTML = `<div class="flex items-center justify-center p-4"><i class="fas fa-spinner fa-spin text-sky-500 text-2xl mr-3"></i> <span class="text-xs font-bold text-sky-600">AI đang lập báo cáo so sánh...</span></div>`;
+            box.innerHTML = `<div class="flex items-center justify-center p-4"><i class="fas fa-spinner fa-spin text-sky-500 text-2xl mr-3"></i> <span class="text-xs font-bold text-sky-600">AI đang quét Core System...</span></div>`;
+
+            const modelName = await getBestGeminiModel(key);
 
             const fStart = AppState.activeFilterStart;
             const fEnd = AppState.activeFilterEnd;
@@ -643,7 +667,7 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
 (Format bắt buộc: Dùng tiếng Việt chuẩn, không dùng ký tự Markdown dư thừa như **, dùng thẻ HTML cơ bản <b>, <br> nếu cần in đậm và xuống dòng). Đừng chào hỏi dông dài.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{text: promptText}] }] })
