@@ -643,7 +643,7 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
 (Format bắt buộc: Dùng tiếng Việt chuẩn, không dùng ký tự Markdown dư thừa như **, dùng thẻ HTML cơ bản <b>, <br> nếu cần in đậm và xuống dòng). Đừng chào hỏi dông dài.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{text: promptText}] }] })
@@ -653,7 +653,7 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
                 if (!res.ok) {
                     const errText = await res.text();
                     console.error("Network Detail:", errText);
-                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Từ chối truy cập (Mã ${res.status}): Bạn hãy kiểm tra lại kết nối mạng, Extension Adblock, hoặc Key API bị hạn chế quyền. <br><span class="opacity-60 text-[9px]">${errText.substring(0,60)}...</span></p>`;
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi (Mã ${res.status}): <br><span class="opacity-80 text-[10px] break-words">${errText}</span></p>`;
                     return;
                 }
 
