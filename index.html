@@ -2,33 +2,34 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Onion's Spend</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Onion's Spend">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #0ea5e9; 
-            --primary-dark: #0284c7; 
-            --bg-color: #f0f9ff;     
+            --primary-blue: #0ea5e9;
+            --primary-dark: #0284c7;
+            --bg-color: #f0f9ff;
             --card-bg: rgba(255, 255, 255, 0.85);
             --card-border: rgba(255, 255, 255, 0.5);
         }
-        body { 
-            font-family: 'Nunito', sans-serif; 
+        body {
+            font-family: 'Nunito', sans-serif;
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
             background-attachment: fixed;
-            color: #334155; 
+            color: #334155;
         }
-        
+
         .glass-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -51,15 +52,15 @@
             border-top: 1px solid rgba(255,255,255,0.6);
         }
 
-        input, select, textarea { 
-            border: 2px solid transparent !important; 
-            outline: none; 
+        input, select, textarea {
+            border: 2px solid transparent !important;
+            outline: none;
             background: rgba(255, 255, 255, 0.9);
             transition: all 0.3s ease;
         }
-        input:focus, select:focus, textarea:focus { 
-            border-color: var(--primary-blue) !important; 
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15); 
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-blue) !important;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
             background: #fff;
         }
 
@@ -86,10 +87,10 @@
         }
         .btn-primary:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4); }
 
-        .cat-checkbox:checked + label { 
-            background: linear-gradient(135deg, #38bdf8, #0ea5e9); 
-            color: white; 
-            border-color: transparent; 
+        .cat-checkbox:checked + label {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            color: white;
+            border-color: transparent;
             box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
             transform: translateY(-2px);
         }
@@ -157,7 +158,7 @@
                     <p class="text-sky-100 text-[11px] font-bold uppercase tracking-widest opacity-90 mt-0.5" id="sync-status">Hành lý sẵn sàng</p>
                 </div>
             </div>
-            
+
             <div class="flex gap-2">
                 <button onclick="openSettings()" class="bg-white/20 w-10 h-10 rounded-xl backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20 transition-transform active:scale-90 relative">
                     <i class="fas fa-cog"></i>
@@ -197,7 +198,7 @@
                                 <option value="Mua sắm">Mua sắm</option>
                                 <option value="Dịch vụ">Dịch vụ</option>
                                 <option value="Quà tặng">Quà tặng</option>
-                                <option value="Du lịch">Du lịch</option>
+                                <option value="Khác">Khác</option>
                             </select>
                         </div>
                     </div>
@@ -224,7 +225,7 @@
                     </button>
                 </form>
             </div>
-            
+
             <div class="text-center pt-2">
                 <i class="fas fa-leaf text-sky-200 text-4xl opacity-60 drop-shadow-sm animate-pulse"></i>
             </div>
@@ -232,7 +233,7 @@
 
         <!-- TAB: STATS -->
         <div id="tab-stats-content" class="hidden-tab fade-in space-y-5">
-            
+
             <!-- Filter Section -->
             <div class="glass-card p-5 space-y-4">
                 <div class="flex justify-between items-center mb-1">
@@ -366,7 +367,7 @@
                     </table>
                 </div>
             </div>
-            
+
             <div class="pb-6"></div>
         </div>
     </div>
@@ -383,20 +384,20 @@
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHKN-MOL4JMugIX8628RX3L2JPkg6sXD6x3Apeiwb-oIaHVUlpRg9KlusSJxzQ423T/exec'; 
-        
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHKN-MOL4JMugIX8628RX3L2JPkg6sXD6x3Apeiwb-oIaHVUlpRg9KlusSJxzQ423T/exec';
+
         Chart.defaults.font.family = "'Nunito', sans-serif";
         Chart.defaults.color = '#64748b';
 
         const CAT_COLORS = {
-            'Ăn uống': '#f59e0b',  
-            'Ăn chơi': '#ec4899',  
-            'Tiền nhà': '#8b5cf6', 
-            'Đi lại': '#0ea5e9',   
-            'Mua sắm': '#f43f5e',  
-            'Dịch vụ': '#10b981',  
-            'Quà tặng': '#f97316', 
-            'Du lịch': '#94a3b8'      
+            'Ăn uống': '#f59e0b',
+            'Ăn chơi': '#ec4899',
+            'Tiền nhà': '#8b5cf6',
+            'Đi lại': '#0ea5e9',
+            'Mua sắm': '#f43f5e',
+            'Dịch vụ': '#10b981',
+            'Quà tặng': '#f97316',
+            'Khác': '#94a3b8'
         };
         const getCatColor = (cat) => CAT_COLORS[cat] || '#38bdf8';
 
@@ -408,19 +409,56 @@
             allCategoriesInSheet: [],
             timelineMode: 'day',
             biorhythmMode: 'weekday',
+            selectedCats: null,        // null = chưa khởi tạo lần đầu
+            activePeriod: 'this_month',
             activeFilterStart: new Date(),
             activeFilterEnd: new Date()
         };
 
+        const atMidnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const todayStr = () => ymd(new Date());
+
+        const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+
         const parseSheetDate = (dateInput) => {
             if (!dateInput) return new Date(0);
-            if (dateInput instanceof Date) return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
-            const s = String(dateInput);
+            if (dateInput instanceof Date) return atMidnight(dateInput);
+            const s = String(dateInput).trim();
+            // Apps Script serialize ô ngày thành ISO UTC ("2026-09-03T17:00:00.000Z" = 04/09 giờ VN)
+            // => phải quy về ngày theo giờ local, không được cắt phần ngày của chuỗi UTC.
+            if (/^\d{4}-\d{1,2}-\d{1,2}T/.test(s)) {
+                const d = new Date(s);
+                return isNaN(d.getTime()) ? new Date(0) : atMidnight(d);
+            }
             let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
             if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
             m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
             if (m) return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
-            return isNaN(new Date(s).getTime()) ? new Date(0) : new Date(s);
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? new Date(0) : atMidnight(d);
+        };
+
+        // Tuần ISO (thứ Hai đầu tuần) - dùng cho biểu đồ dòng chảy
+        const mondayOf = (d) => {
+            const t = atMidnight(d);
+            t.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+            return t;
+        };
+        const isoWeekNum = (d) => {
+            const t = atMidnight(d);
+            t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+            const firstThu = new Date(t.getFullYear(), 0, 4);
+            firstThu.setDate(firstThu.getDate() + 3 - ((firstThu.getDay() + 6) % 7));
+            return 1 + Math.round((t - firstThu) / 604800000);
+        };
+
+        const sumByCategory = (rows) => {
+            const m = {};
+            rows.forEach(i => { m[i.category] = (m[i.category] || 0) + i.amount; });
+            return m;
         };
 
         const toggleLoading = (s) => document.getElementById('loading').classList.toggle('hidden', !s);
@@ -456,10 +494,10 @@
         function switchTab(tab) {
             document.getElementById('tab-input-content').classList.toggle('hidden-tab', tab !== 'input');
             document.getElementById('tab-stats-content').classList.toggle('hidden-tab', tab !== 'stats');
-            
+
             const btnInput = document.getElementById('btn-input');
             const btnStats = document.getElementById('btn-stats');
-            
+
             if(tab === 'input') {
                 btnInput.classList.add('tab-active');
                 btnInput.classList.remove('text-slate-400');
@@ -480,16 +518,21 @@
             try {
                 const res = await fetch(SCRIPT_URL + '?action=get', { method: 'GET', redirect: 'follow' });
                 const raw = await res.json();
-                AppState.allData = raw.map(item => ({
-                    ...item,
-                    category: String(item.category || "Khác").trim(),
-                    amount: Number(item.amount) || 0
-                }));
+                if (!Array.isArray(raw)) {
+                    throw new Error((raw && (raw.error || raw.message)) || 'Máy chủ trả về dữ liệu không hợp lệ');
+                }
+                AppState.allData = raw.map(item => {
+                    let cat = String(item.category || "Khác").trim();
+                    // "Du lịch" đã ngừng dùng -> gộp vào "Dịch vụ" để không mất số liệu cũ
+                    if (cat.toLowerCase() === 'du lịch') cat = 'Dịch vụ';
+                    return { ...item, category: cat, amount: Number(item.amount) || 0 };
+                });
                 document.getElementById('sync-status').innerText = "Cập nhật lúc " + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
                 updateCategoryFilterUI();
                 applyFilters();
             } catch (e) {
-                alert("Lỗi kết nối. Gió to quá mạng rớt rồi!");
+                console.error("fetchData:", e);
+                alert("Lỗi kết nối: " + e.message);
             } finally {
                 toggleLoading(false);
             }
@@ -498,21 +541,22 @@
         function updateCategoryFilterUI() {
             const container = document.getElementById('category-multi-box');
             container.innerHTML = '';
-            AppState.allCategoriesInSheet = [...new Set(AppState.allData.map(item => String(item.category || "Khác").trim()))].sort();
-            
-            // Lọc bỏ hẳn thuộc tính bị loại khỏi DB lưu (Du Lịch)
-            AppState.allCategoriesInSheet = AppState.allCategoriesInSheet.filter(cat => cat.toLowerCase() !== 'du lịch');
-            
+            // Giữ nguyên lựa chọn của người dùng qua mỗi lần đồng bộ.
+            // Lần đầu (selectedCats === null): bật hết trừ "Quà tặng".
+            const prev = AppState.selectedCats;
+            const known = AppState.allCategoriesInSheet;
+            AppState.allCategoriesInSheet = [...new Set(AppState.allData.map(item => item.category))].sort();
+
             AppState.allCategoriesInSheet.forEach((cat, index) => {
                 const color = getCatColor(cat);
-                const isGift = cat.toLowerCase() === 'quà tặng';
-                const checkedAttr = isGift ? '' : 'checked'; // Quà Tặng được TẮT MẶC ĐỊNH
-                
+                // Danh mục mới xuất hiện sau lần lọc gần nhất thì bật sẵn, tránh ẩn dữ liệu mà không ai biết
+                const isChecked = prev ? (prev.includes(cat) || !known.includes(cat)) : cat.toLowerCase() !== 'quà tặng';
+
                 const div = document.createElement('div');
                 div.innerHTML = `
-                    <input type="checkbox" id="cat-${index}" value="${cat}" class="hidden cat-checkbox" ${checkedAttr} onchange="applyFilters()">
+                    <input type="checkbox" id="cat-${index}" value="${escapeHtml(cat)}" class="hidden cat-checkbox" ${isChecked ? 'checked' : ''} onchange="applyFilters()">
                     <label for="cat-${index}" class="filter-label px-3.5 py-1.5 bg-white/60 border border-sky-100 rounded-xl text-[11px] font-bold text-sky-700 cursor-pointer block whitespace-nowrap shadow-sm hover:bg-white transition-all">
-                        <i class="fas fa-circle mr-1" style="color: ${color}; font-size: 8px; vertical-align: middle;"></i> ${cat}
+                        <i class="fas fa-circle mr-1" style="color: ${color}; font-size: 8px; vertical-align: middle;"></i> ${escapeHtml(cat)}
                     </label>
                 `;
                 container.appendChild(div);
@@ -527,23 +571,30 @@
 
         function applyFilters() {
             const period = document.getElementById('filter-period').value;
-            const now = parseSheetDate(new Date());
-            const selectedCats = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => cb.value);
-            
+            const now = atMidnight(new Date());
+
+            const boxes = document.querySelectorAll('.cat-checkbox');
+            const selectedCats = Array.from(boxes).filter(cb => cb.checked).map(cb => cb.value);
+            AppState.activePeriod = period;
+            // Chỉ ghi nhớ khi UI checkbox đã được dựng, tránh lưu nhầm mảng rỗng lúc chưa tải data
+            if (boxes.length) AppState.selectedCats = selectedCats;
+
             let start, end;
             let isPast = false;
 
             switch(period) {
                 case 'today': start = now; end = now; break;
-                case 'this_week':
+                case 'this_week': {
                     const dWeek = now.getDay() || 7;
                     start = new Date(now); start.setDate(now.getDate() - dWeek + 1);
                     end = now; break;
-                case 'last_week':
+                }
+                case 'last_week': {
                     const lwDay = now.getDay() || 7;
                     start = new Date(now); start.setDate(now.getDate() - lwDay - 6);
                     end = new Date(start); end.setDate(start.getDate() + 6);
                     isPast = true; break;
+                }
                 case 'this_month':
                     start = new Date(now.getFullYear(), now.getMonth(), 1);
                     end = now; break;
@@ -564,29 +615,40 @@
                 case 'last_30_days':
                     start = new Date(now); start.setDate(now.getDate() - 29);
                     end = now; break;
-                case 'custom':
-                    start = parseSheetDate(document.getElementById('start-date').value);
-                    end = parseSheetDate(document.getElementById('end-date').value);
+                case 'custom': {
+                    const sRaw = document.getElementById('start-date').value;
+                    const eRaw = document.getElementById('end-date').value;
+                    if (!sRaw || !eRaw) { alert('Chọn đủ ngày bắt đầu và ngày kết thúc nhé.'); return; }
+                    start = parseSheetDate(sRaw);
+                    end = parseSheetDate(eRaw);
+                    if (start > end) { const tmp = start; start = end; end = tmp; }
                     isPast = true; break;
-                default: start = new Date(2000, 0, 1); end = now;
+                }
+                default: {
+                    // "Tất cả thời gian": mốc đầu là giao dịch sớm nhất, không phải năm 2000,
+                    // nếu không "Tốc Độ / Ngày" sẽ bị chia cho hàng ngàn ngày trống.
+                    const times = AppState.allData
+                        .map(i => parseSheetDate(i.date).getTime())
+                        .filter(t => t > 0);
+                    start = times.length ? new Date(times.reduce((a, b) => Math.min(a, b))) : now;
+                    end = now;
+                }
             }
 
             const fStart = new Date(start); fStart.setHours(0,0,0,0);
             const fEnd = new Date(end); fEnd.setHours(23,59,59,999);
-            
+
             AppState.activeFilterStart = fStart;
             AppState.activeFilterEnd = fEnd;
 
-            AppState.currentPeriodDays = isPast ? 
+            AppState.currentPeriodDays = isPast ?
                 Math.ceil(Math.abs(fEnd - fStart) / 86400000) || 1 :
                 Math.ceil(Math.abs(now - fStart) / 86400000) + 1;
 
             AppState.filteredData = AppState.allData.filter(item => {
                 const itemDate = parseSheetDate(item.date);
-                if(item.category.toLowerCase() === 'du lịch') return false;
-
-                return itemDate >= fStart && itemDate <= fEnd &&
-                       (selectedCats.length === 0 || selectedCats.includes(item.category));
+                // Bỏ chọn hết danh mục => không hiện gì, đúng như người dùng mong đợi
+                return itemDate >= fStart && itemDate <= fEnd && selectedCats.includes(item.category);
             });
 
             updateDashboard();
@@ -601,7 +663,7 @@
                 const available = (data.models || [])
                     .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
                     .map(m => m.name.split('/')[1]);
-                
+
                 // Độ ưu tiên tìm kiếm model mới nhất
                 const keywords = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
                 for(const kw of keywords) {
@@ -629,20 +691,48 @@
 
             const fStart = AppState.activeFilterStart;
             const fEnd = AppState.activeFilterEnd;
-            const span = fEnd.getTime() - fStart.getTime();
-            
-            // Tính toán Kỳ trước với khoảng thời gian tương đương (VD: Tháng Này -> lùi đúng 30 ngày)
-            const prevEnd = new Date(fStart.getTime() - 1);
-            const prevStart = new Date(prevEnd.getTime() - span);
-            
+
+            // Kỳ trước phải theo LỊCH (tháng này -> tháng trước), không phải lùi đúng số ngày,
+            // nếu không "Tháng này" ngày mùng 4 sẽ đi so với 4 ngày cuối tháng trước.
+            let prevStart, prevEnd;
+            const endOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+            switch (AppState.activePeriod) {
+                case 'this_month':
+                case 'last_month':
+                    prevStart = new Date(fStart.getFullYear(), fStart.getMonth() - 1, 1);
+                    prevEnd = endOfDay(new Date(fStart.getFullYear(), fStart.getMonth(), 0));
+                    break;
+                case 'this_week':
+                case 'last_week':
+                    prevStart = new Date(fStart); prevStart.setDate(fStart.getDate() - 7);
+                    prevEnd = new Date(prevStart); prevEnd.setDate(prevStart.getDate() + 6);
+                    prevEnd = endOfDay(prevEnd);
+                    break;
+                case 'this_year':
+                case 'last_year':
+                    prevStart = new Date(fStart.getFullYear() - 1, 0, 1);
+                    prevEnd = endOfDay(new Date(fStart.getFullYear() - 1, 11, 31));
+                    break;
+                case 'today':
+                    prevStart = new Date(fStart); prevStart.setDate(fStart.getDate() - 1);
+                    prevEnd = endOfDay(prevStart);
+                    break;
+                default:
+                    // 7/30 ngày qua, khoảng tùy chỉnh, tất cả: lùi đúng độ dài khoảng đang xem
+                    prevEnd = new Date(fStart.getTime() - 1);
+                    prevStart = new Date(prevEnd.getTime() - (fEnd.getTime() - fStart.getTime()));
+            }
+
+            const fmtRange = (a, b) => `${a.toLocaleDateString('vi-VN')} - ${b.toLocaleDateString('vi-VN')}`;
+
             const currentCats = {};
             const prevCats = {};
-            const selectedCats = Array.from(document.querySelectorAll('.cat-checkbox:checked')).map(cb => cb.value);
+            const selectedCats = AppState.selectedCats || [];
 
             AppState.allData.forEach(item => {
                 const itemDate = parseSheetDate(item.date);
                 const cat = item.category;
-                if(selectedCats.length > 0 && !selectedCats.includes(cat)) return;
+                if(!selectedCats.includes(cat)) return;
 
                 if(itemDate >= fStart && itemDate <= fEnd) {
                     currentCats[cat] = (currentCats[cat] || 0) + item.amount;
@@ -655,10 +745,10 @@
             let currentText = formatArr(currentCats) || "0đ";
             let prevText = formatArr(prevCats) || "0đ";
 
-            const promptText = `Bạn là một Cố Vấn Tài Chính phân tích sắc bén và nghiêm túc nhưng lời lẽ gần gũi. 
+            const promptText = `Bạn là một Cố Vấn Tài Chính phân tích sắc bén và nghiêm túc nhưng lời lẽ gần gũi.
 Dữ liệu chi tiêu của tôi được biểu diễn bằng hàng ngàn đồng (k).
-- Dữ liệu KỲ TRƯỚC (khoảng thời gian tương đương): ${prevText}
-- Dữ liệu KỲ HIỆN TẠI: ${currentText}
+- Dữ liệu KỲ TRƯỚC (${fmtRange(prevStart, prevEnd)}): ${prevText}
+- Dữ liệu KỲ HIỆN TẠI (${fmtRange(fStart, fEnd)}): ${currentText}
 
 Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đầu dòng:
 1. 📈 Xu Hướng: Chỉ chĩa thẳng vào tên danh mục nào ĐANG TĂNG mạnh hoặc giảm mạnh.
@@ -678,19 +768,25 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
                 if (!res.ok) {
                     const errText = await res.text();
                     console.error("Network Detail:", errText);
-                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi (Mã ${res.status}): <br><span class="opacity-80 text-[10px] break-words">${errText}</span></p>`;
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi (Mã ${res.status}): <br><span class="opacity-80 text-[10px] break-words">${escapeHtml(errText)}</span></p>`;
                     return;
                 }
 
                 const data = await res.json();
                 if(data.error) {
-                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi máy chủ Google: ${data.error.message}</p>`;
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi máy chủ Google: ${escapeHtml(data.error.message)}</p>`;
                     return;
                 }
-                
-                let reply = data.candidates[0].content.parts[0].text;
-                reply = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-                box.innerHTML = reply;
+
+                // Gemini có thể trả 200 mà không có candidates (bị chặn bởi safety filter)
+                const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!raw) {
+                    const why = data?.promptFeedback?.blockReason || 'model không trả về nội dung';
+                    box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> AI không phản hồi được (${escapeHtml(why)}).</p>`;
+                    return;
+                }
+
+                box.innerHTML = raw.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
             } catch(e) {
                 console.error("Fetch Exception:", e);
                 box.innerHTML = `<p class="text-rose-500 font-bold text-xs"><i class="fas fa-exclamation-triangle"></i> Lỗi đường truyền Mạng/Trình duyệt: ${e.message}</p>`;
@@ -709,17 +805,17 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
             renderRadarChart();
             renderDoughnutChart();
             renderBiorhythmChart();
-            renderTimelineChart(); 
+            renderTimelineChart();
             renderTable();
         }
 
         function renderRadarChart() {
-            const m = {}; AppState.filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
+            const m = sumByCategory(AppState.filteredData);
             const labels = Object.keys(m);
             const data = labels.map(l => m[l]);
 
             if(AppState.chartInstances.radar) AppState.chartInstances.radar.destroy();
-            
+
             AppState.chartInstances.radar = new Chart(document.getElementById('radarChart'), {
                 type: 'radar',
                 data: {
@@ -743,19 +839,19 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
                             angleLines: { color: 'rgba(14, 165, 233, 0.15)' },
                             grid: { color: 'rgba(14, 165, 233, 0.2)' },
                             pointLabels: { font: { size: 10, family: 'Nunito', weight: '800' }, color: '#0369a1' },
-                            ticks: { display: false } 
+                            ticks: { display: false }
                         }
                     },
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', titleFont: {family: 'Nunito', weight: 'bold'} } 
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', titleFont: {family: 'Nunito', weight: 'bold'} }
                     }
                 }
             });
         }
 
         function renderDoughnutChart() {
-            const m = {}; AppState.filteredData.forEach(i => m[i.category] = (m[i.category] || 0) + i.amount);
+            const m = sumByCategory(AppState.filteredData);
             const labels = Object.keys(m).sort((a,b) => m[b] - m[a]);
             const data = labels.map(l => m[l]);
             const total = data.reduce((a,b) => a+b, 0) || 1;
@@ -766,28 +862,27 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
             const centerTextPlugin = {
                 id: 'centerText',
                 beforeDraw: function(chart) {
-                    if (data.length === 0) return;
-                    const {width, height, ctx} = chart;
-                    ctx.restore();
+                    if (data.length === 0 || !chart.chartArea) return;
+                    const ctx = chart.ctx;
+                    const { left, right, top, bottom } = chart.chartArea;
+                    // Tâm phải lấy theo chartArea: legend nằm bên phải nên width/2 lệch khỏi vòng tròn
+                    const x = (left + right) / 2;
+                    const y = (top + bottom) / 2;
                     const topLabel = labels[0];
                     const topPct = Math.round((data[0]/total)*100) + '%';
-                    
+
+                    ctx.save();
                     ctx.textBaseline = "middle";
                     ctx.textAlign = "center";
-                    const x = width / 2;
-                    let y = height / 2;
-                    
-                    const isCompact = width < 250;
-                    if(isCompact) x = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left)/2;
 
                     ctx.font = "900 24px Nunito";
-                    ctx.fillStyle = getCatColor(topLabel); 
+                    ctx.fillStyle = getCatColor(topLabel);
                     ctx.fillText(topPct, x, y - 5);
-                    
+
                     ctx.font = "800 12px Nunito";
                     ctx.fillStyle = "#64748b";
                     ctx.fillText(topLabel, x, y + 15);
-                    ctx.save();
+                    ctx.restore();
                 }
             };
 
@@ -816,13 +911,13 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
 
             let labels = [];
             let data = [];
-            
+
             if(AppState.biorhythmMode === 'weekday') {
                 const daysArr = new Array(7).fill(0);
                 AppState.filteredData.forEach(i => {
                     daysArr[parseSheetDate(i.date).getDay()] += i.amount;
                 });
-                const orderMap = [1,2,3,4,5,6,0]; 
+                const orderMap = [1,2,3,4,5,6,0];
                 labels = ['T.2', 'T.3', 'T.4', 'T.5', 'T.6', 'T.7', 'CN'];
                 data = orderMap.map(idx => daysArr[idx]);
             } else {
@@ -844,12 +939,12 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
                 options: {
                     maintainAspectRatio: false,
                     scales: {
-                        y: { display: false }, 
+                        y: { display: false },
                         x: { border: {display: false}, grid: {display: false}, ticks: {font: {size: AppState.biorhythmMode === 'weekday' ? 11 : 8, family: 'Nunito', weight: 'bold'}, color: '#64748b', maxTicksLimit: 31} }
                     },
-                    plugins: { 
-                        legend: {display: false}, 
-                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString()}đ` } } 
+                    plugins: {
+                        legend: {display: false},
+                        tooltip: { backgroundColor: 'rgba(14, 165, 233, 0.95)', callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString()}đ` } }
                     }
                 }
             });
@@ -871,17 +966,17 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
             if(AppState.chartInstances.timeline) AppState.chartInstances.timeline.destroy();
 
             const timeMap = {};
-            AppState.filteredData.forEach(i => { 
+            AppState.filteredData.forEach(i => {
                 const d = parseSheetDate(i.date);
                 let key, labelStr;
                 if(AppState.timelineMode === 'day') {
-                    key = d.toISOString().split('T')[0];
+                    key = ymd(d); // theo giờ local, không dùng toISOString (bị lệch 1 ngày ở GMT+7)
                     labelStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`;
                 } else if(AppState.timelineMode === 'week') {
-                    const oneJan = new Date(d.getFullYear(), 0, 1);
-                    const weekNum = Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-                    key = `${d.getFullYear()}-W${weekNum}`;
-                    labelStr = `Tuần ${weekNum}`;
+                    // Key = ngày thứ Hai đầu tuần để sort chuỗi ra đúng thứ tự
+                    // (key cũ "2026-W2" > "2026-W10" khi so sánh chuỗi => đồ thị lộn xộn)
+                    key = ymd(mondayOf(d));
+                    labelStr = `Tuần ${isoWeekNum(d)}`;
                 } else if(AppState.timelineMode === 'month') {
                     key = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
                     labelStr = `Th. ${d.getMonth()+1}`;
@@ -897,28 +992,34 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
             const sortedKeys = Object.keys(timeMap).sort();
             const data = sortedKeys.map(k => timeMap[k].amount);
             const labels = sortedKeys.map(k => timeMap[k].label);
-            
+
             const ctx = document.getElementById('timelineChart').getContext('2d');
-            const gradientFill = ctx.createLinearGradient(0, 0, 0, 150);
-            gradientFill.addColorStop(0, "rgba(56, 189, 248, 0.4)");
-            gradientFill.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+            // Gradient phải bám theo chiều cao thật của vùng vẽ, không hardcode 150px
+            const gradientFill = (context) => {
+                const { ctx: c, chartArea } = context.chart;
+                if (!chartArea) return 'rgba(56, 189, 248, 0.2)';
+                const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                g.addColorStop(0, "rgba(56, 189, 248, 0.4)");
+                g.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+                return g;
+            };
 
             AppState.chartInstances.timeline = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels, 
-                    datasets: [{ 
-                        data, 
-                        borderColor: '#0284c7', 
-                        borderWidth: 3, 
-                        fill: true, 
-                        backgroundColor: gradientFill, 
-                        tension: 0.4, 
-                        pointRadius: AppState.timelineMode === 'day' && data.length > 20 ? 0 : 3, 
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        borderColor: '#0284c7',
+                        borderWidth: 3,
+                        fill: true,
+                        backgroundColor: gradientFill,
+                        tension: 0.4,
+                        pointRadius: AppState.timelineMode === 'day' && data.length > 20 ? 0 : 3,
                         pointHoverRadius: 6,
-                        pointBackgroundColor: '#fff', 
-                        pointBorderColor: '#0284c7' 
-                    }] 
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0284c7'
+                    }]
                 },
                 options: {
                     maintainAspectRatio: false,
@@ -926,27 +1027,38 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
                         y: { border: {display:false}, grid: {color: 'rgba(14, 165, 233, 0.15)', drawTicks: false}, ticks: { font: {size: 9, weight: 'bold'}, callback: v => v/1000 + 'k' } },
                         x: { border: {display:false}, grid: {display: false}, ticks: { font: {size: 9, weight: 'bold'}, maxTicksLimit: 7 } }
                     },
-                    plugins: { 
-                        legend: {display: false}, 
-                        tooltip: { backgroundColor: 'rgba(2, 132, 199, 0.95)', padding: 10, cornerRadius: 8, intersect: false, mode: 'index' } 
+                    plugins: {
+                        legend: {display: false},
+                        tooltip: { backgroundColor: 'rgba(2, 132, 199, 0.95)', padding: 10, cornerRadius: 8, intersect: false, mode: 'index' }
                     }
                 }
             });
         }
 
         function renderTable() {
-            const b = document.getElementById('rawDataTable'); b.innerHTML = '';
-            AppState.filteredData.sort((x,y) => parseSheetDate(y.date) - parseSheetDate(x.date)).slice(0,10).forEach(i => {
+            const b = document.getElementById('rawDataTable');
+            // Copy trước khi sort: không sửa thứ tự mảng gốc trong AppState
+            const rows = [...AppState.filteredData]
+                .sort((x, y) => parseSheetDate(y.date) - parseSheetDate(x.date))
+                .slice(0, 10);
+
+            if (!rows.length) {
+                b.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 italic font-semibold">Chưa có dấu chân nào trong khoảng này</td></tr>`;
+                return;
+            }
+
+            b.innerHTML = rows.map(i => {
                 const badgeColor = getCatColor(i.category);
-                b.innerHTML += `<tr class="hover:bg-white/50 transition-colors">
+                const cat = escapeHtml(i.category);
+                return `<tr class="hover:bg-white/50 transition-colors">
                     <td class="py-3.5 font-bold text-slate-500">${parseSheetDate(i.date).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</td>
                     <td class="py-3.5 font-extrabold flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${badgeColor};"></span>
-                        <span style="color: ${badgeColor};">${i.category}</span>
+                        <span style="color: ${badgeColor};">${cat}</span>
                     </td>
                     <td class="py-3.5 text-right font-black text-slate-700">${i.amount.toLocaleString()}đ</td>
                 </tr>`;
-            });
+            }).join('');
         }
 
         document.getElementById('expenseForm').addEventListener('submit', async (e) => {
@@ -959,20 +1071,28 @@ Dựa vào dữ liệu trên, hãy phân tích dưới 120 từ theo 3 gạch đ
             p.append('note', document.getElementById('note').value);
             p.append('action', 'append');
             try {
+                // mode:'no-cors' => response là opaque, KHÔNG thể biết Apps Script ghi thành công hay không.
+                // Vì vậy không khẳng định "thành công", và luôn tải lại dữ liệu để xác nhận bằng mắt.
                 await fetch(SCRIPT_URL, { method: 'POST', body: p, mode: 'no-cors' });
                 document.getElementById('expenseForm').reset();
-                document.getElementById('date').valueAsDate = new Date();
-                
-                const statusInfo = document.getElementById('sync-status');
-                statusInfo.innerText = "Wow! Tuyệt vời 🥳";
-                setTimeout(() => statusInfo.innerText = "Hành lý sẵn sàng", 3500);
+                document.getElementById('date').value = todayStr();
 
-                fetchData(); 
-            } catch (err) { alert("Lỗi kết nối. Mây mù che khuất sóng rồi!"); }
+                const statusInfo = document.getElementById('sync-status');
+                statusInfo.innerText = "Đã gửi, đang kiểm tra lại...";
+
+                await fetchData(); // fetchData tự ghi mốc thời gian, nên báo lại sau khi nó xong
+                statusInfo.innerText = "Đã lưu lên mây 🥳";
+                setTimeout(() => statusInfo.innerText = "Hành lý sẵn sàng", 3500);
+            } catch (err) {
+                console.error("submit:", err);
+                alert("Lỗi kết nối. Mây mù che khuất sóng rồi!");
+            }
             finally { toggleLoading(false); }
         });
 
-        document.getElementById('date').valueAsDate = new Date();
+        // .value + chuỗi local, KHÔNG dùng valueAsDate (setter đó đọc theo UTC
+        // => trước 7h sáng giờ VN sẽ điền lùi 1 ngày)
+        document.getElementById('date').value = todayStr();
         checkAIKey(); // kiểm tra lần đầu khi bật app
         fetchData();
     </script>
